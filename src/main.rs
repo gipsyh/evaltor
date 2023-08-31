@@ -1,10 +1,8 @@
-#![feature(thread_id_value)]
-
 use std::{
     fs::read_dir,
     process::Command,
     sync::Arc,
-    thread::{sleep, spawn},
+    thread::spawn,
     time::{Duration, Instant},
 };
 
@@ -52,7 +50,7 @@ impl Evaluation {
         Self {
             benchmark,
             evaluatees: Vec::new(),
-            timeout: Duration::from_secs(10),
+            timeout: Duration::from_secs(1000),
         }
     }
 
