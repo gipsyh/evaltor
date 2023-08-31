@@ -1,4 +1,14 @@
-use std::fs::read_dir;
+#![feature(thread_id_value)]
+
+use std::{
+    fs::read_dir,
+    process::Command,
+    sync::Arc,
+    thread::{sleep, spawn},
+    time::{Duration, Instant},
+};
+
+use wait_timeout::ChildExt;
 
 pub struct Benchmark {
     path: String,
@@ -15,7 +25,7 @@ impl Benchmark {
 
     pub fn caces(&self) -> impl Iterator<Item = String> + '_ {
         read_dir(&self.path).unwrap().filter_map(|entry| {
-            if let Some(file_name) = entry.ok()?.file_name().to_str() {
+            if let Some(file_name) = entry.ok()?.path().to_str() {
                 if file_name.ends_with(&self.suffix) {
                     return Some(file_name.to_owned());
                 }
@@ -25,15 +35,16 @@ impl Benchmark {
     }
 }
 
-pub trait Evaluatee {
+pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
-    fn evaluate(&mut self, path: &str);
+    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration>;
 }
 
 pub struct Evaluation {
     benchmark: Benchmark,
-    evaluatees: Vec<Box<dyn Evaluatee>>,
+    evaluatees: Vec<Arc<dyn Evaluatee>>,
+    timeout: Duration,
 }
 
 impl Evaluation {
@@ -41,16 +52,47 @@ impl Evaluation {
         Self {
             benchmark,
             evaluatees: Vec::new(),
+            timeout: Duration::from_secs(10),
         }
     }
 
+    pub fn set_timeout(&mut self, timeout: Duration) {
+        self.timeout = timeout
+    }
+
     pub fn add_evaluatee(&mut self, evaluatee: impl Evaluatee + 'static) {
-        self.evaluatees.push(Box::new(evaluatee));
+        self.evaluatees.push(Arc::new(evaluatee));
     }
 
     pub fn evaluate(&mut self) {
-        for case in self.benchmark.caces() {
-            dbg!(case);
+        for evaluatee in self.evaluatees.iter() {
+            for case in self.benchmark.caces() {
+                let evaluatee = evaluatee.clone();
+                let timeout = self.timeout.clone();
+                let join = spawn(move || evaluatee.evaluate(&case, timeout));
+                let time = join.join().unwrap();
+                dbg!(time);
+            }
+        }
+    }
+}
+
+struct AbcPdr;
+
+impl Evaluatee for AbcPdr {
+    fn name(&self) -> String {
+        "abc-pdr".to_string()
+    }
+
+    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+        let path = format!("read {path}; pdr -v");
+        let mut child = Command::new("abc").arg("-c").arg(path).spawn().unwrap();
+        let start = Instant::now();
+        if let Ok(Some(_)) = child.wait_timeout(timeout) {
+            Some(start.elapsed())
+        } else {
+            child.kill().unwrap();
+            None
         }
     }
 }
@@ -61,5 +103,6 @@ fn main() {
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
+    evaluation.add_evaluatee(AbcPdr);
     evaluation.evaluate();
 }
