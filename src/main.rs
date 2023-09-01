@@ -1,11 +1,14 @@
 use std::{
-    fs::read_dir,
+    fs::{read_dir, File},
+    io::Write,
+    path::Path,
     process::Command,
     sync::Arc,
     thread::spawn,
     time::{Duration, Instant},
 };
 
+use chrono::Local;
 use wait_timeout::ChildExt;
 
 pub struct Benchmark {
@@ -64,11 +67,26 @@ impl Evaluation {
 
     pub fn evaluate(&mut self) {
         for evaluatee in self.evaluatees.iter() {
+            let result_file = format!(
+                "result/{}-{}",
+                evaluatee.name(),
+                Local::now().format("%m-%d-%H-%M")
+            );
+            let mut result = File::create(Path::new(&result_file)).unwrap();
             for case in self.benchmark.caces() {
                 let evaluatee = evaluatee.clone();
                 let timeout = self.timeout.clone();
-                let join = spawn(move || evaluatee.evaluate(&case, timeout));
+                let case_clone = case.clone();
+                let join = spawn(move || evaluatee.evaluate(&case_clone, timeout));
                 let time = join.join().unwrap();
+                let out_time = match time {
+                    Some(time) => {
+                        format!("{:.2}", time.as_secs_f32()).to_string()
+                    },
+                    None => "None".to_string(),
+                };
+                let out = format!("{} {}\n", case, out_time);
+                result.write_all(out.as_bytes()).unwrap();
                 dbg!(time);
             }
         }
@@ -101,6 +119,7 @@ fn main() {
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
+    evaluation.set_timeout(Duration::from_secs(300));
     evaluation.add_evaluatee(AbcPdr);
     evaluation.evaluate();
 }
