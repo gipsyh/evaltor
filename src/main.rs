@@ -80,9 +80,7 @@ impl Evaluation {
                 let join = spawn(move || evaluatee.evaluate(&case_clone, timeout));
                 let time = join.join().unwrap();
                 let out_time = match time {
-                    Some(time) => {
-                        format!("{:.2}", time.as_secs_f32()).to_string()
-                    },
+                    Some(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
                     None => "None".to_string(),
                 };
                 let out = format!("{} {}\n", case, out_time);
@@ -119,7 +117,7 @@ fn main() {
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(300));
+    evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.add_evaluatee(AbcPdr);
     evaluation.evaluate();
 }
