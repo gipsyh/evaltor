@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    data = []
-    with open("result/abc-pdr-09-01-13-00", "r") as file:
-        for line in file:
-            model, time = line.strip().split()
-            if time != "None":
-                print(time)
-                data.append(float(time))
-    data = sorted(data)
-    print(data)
-    print(len(data))
+    files = ["result/abc-pdr-ctp-09-07-21-08", "result/abc-pdr-08-31-16-20"]
+    for file in files:
+        data = []
+        with open(file, "r") as file:
+            for line in file:
+                model, time = line.strip().split()
+                if time != "None":
+                    print(time)
+                    data.append(float(time))
+        data = sorted(data)
+        plt.plot(range(len(data)), data, marker="x")
 
-    plt.plot(range(len(data)), data, marker="o")
     plt.title("result")
     plt.xlabel("solved")
     plt.ylabel("time")

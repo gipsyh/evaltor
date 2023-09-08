@@ -1,3 +1,4 @@
+use chrono::Local;
 use std::{
     fs::{read_dir, File},
     io::Write,
@@ -7,8 +8,6 @@ use std::{
     thread::spawn,
     time::{Duration, Instant},
 };
-
-use chrono::Local;
 use wait_timeout::ChildExt;
 
 pub struct Benchmark {
@@ -111,13 +110,55 @@ impl Evaluatee for AbcPdr {
     }
 }
 
+struct AbcPdrCtp;
+
+impl Evaluatee for AbcPdrCtp {
+    fn name(&self) -> String {
+        "abc-pdr-ctp".to_string()
+    }
+
+    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+        let path = format!("read {path}; pdr -s -v");
+        let mut child = Command::new("/root/abc/abc").arg("-c").arg(path).spawn().unwrap();
+        let start = Instant::now();
+        if let Ok(Some(_)) = child.wait_timeout(timeout) {
+            Some(start.elapsed())
+        } else {
+            child.kill().unwrap();
+            None
+        }
+    }
+}
+
+struct Pic3;
+
+impl Evaluatee for Pic3 {
+    fn name(&self) -> String {
+        "pic3".to_string()
+    }
+
+    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+        let mut child = Command::new("/root/pic3/target/release/pic3-demo")
+            .arg(path)
+            .spawn()
+            .unwrap();
+        let start = Instant::now();
+        if let Ok(Some(_)) = child.wait_timeout(timeout) {
+            Some(start.elapsed())
+        } else {
+            child.kill().unwrap();
+            None
+        }
+    }
+}
+
 fn main() {
     let path = "/root/MC-Benchmark/hwmcc17/single";
     let suffix = ".aig";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.add_evaluatee(AbcPdr);
+    evaluation.set_timeout(Duration::from_secs(300));
+    evaluation.add_evaluatee(AbcPdrCtp);
     evaluation.evaluate();
 }
