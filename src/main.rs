@@ -37,10 +37,17 @@ impl Benchmark {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum EvaluationResult {
+    Success(Duration),
+    Timeout,
+    Failed,
+}
+
 pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration>;
+    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult;
 }
 
 pub struct Evaluation {
@@ -104,15 +111,19 @@ impl Evaluatee for AbcPdr {
         "abc-pdr".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
         let path = format!("read {path}; pdr -v");
         let mut child = Command::new("abc").arg("-c").arg(path).spawn().unwrap();
         let start = Instant::now();
-        if let Ok(Some(_)) = child.wait_timeout(timeout) {
-            Some(start.elapsed())
+        if let Ok(Some(status)) = child.wait_timeout(timeout) {
+            if status.success() {
+                EvaluationResult::Success(start.elapsed())
+            } else {
+                EvaluationResult::Failed
+            }
         } else {
             child.kill().unwrap();
-            None
+            EvaluationResult::Timeout
         }
     }
 }
@@ -124,7 +135,7 @@ impl Evaluatee for AbcPdrCtp {
         "abc-pdr-ctp".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
         let path = format!("read {path}; pdr -s -v");
         let mut child = Command::new("/root/abc/abc")
             .arg("-c")
@@ -132,11 +143,15 @@ impl Evaluatee for AbcPdrCtp {
             .spawn()
             .unwrap();
         let start = Instant::now();
-        if let Ok(Some(_)) = child.wait_timeout(timeout) {
-            Some(start.elapsed())
+        if let Ok(Some(status)) = child.wait_timeout(timeout) {
+            if status.success() {
+                EvaluationResult::Success(start.elapsed())
+            } else {
+                EvaluationResult::Failed
+            }
         } else {
             child.kill().unwrap();
-            None
+            EvaluationResult::Timeout
         }
     }
 }
@@ -148,17 +163,21 @@ impl Evaluatee for Pic3 {
         "pic3".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
         let mut child = Command::new("/root/pic3/target/release/pic3-demo")
             .arg(path)
             .spawn()
             .unwrap();
         let start = Instant::now();
-        if let Ok(Some(_)) = child.wait_timeout(timeout) {
-            Some(start.elapsed())
+        if let Ok(Some(status)) = child.wait_timeout(timeout) {
+            if status.success() {
+                EvaluationResult::Success(start.elapsed())
+            } else {
+                EvaluationResult::Failed
+            }
         } else {
             child.kill().unwrap();
-            None
+            EvaluationResult::Timeout
         }
     }
 }
@@ -170,17 +189,21 @@ impl Evaluatee for MyIc3 {
         "myic3".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
         let mut child = Command::new("/root/ic3/target/release/ic3")
             .arg(path)
             .spawn()
             .unwrap();
         let start = Instant::now();
-        if let Ok(Some(_)) = child.wait_timeout(timeout) {
-            Some(start.elapsed())
+        if let Ok(Some(status)) = child.wait_timeout(timeout) {
+            if status.success() {
+                EvaluationResult::Success(start.elapsed())
+            } else {
+                EvaluationResult::Failed
+            }
         } else {
             child.kill().unwrap();
-            None
+            EvaluationResult::Timeout
         }
     }
 }
@@ -191,8 +214,8 @@ fn main() {
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(10));
-    evaluation.add_evaluatee(AbcPdrCtp);
+    evaluation.set_timeout(Duration::from_secs(1000));
+    evaluation.add_evaluatee(MyIc3);
     evaluation.set_test_cores(16);
     evaluation.evaluate();
 }

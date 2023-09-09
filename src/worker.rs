@@ -1,4 +1,4 @@
-use crate::Evaluatee;
+use crate::{Evaluatee, EvaluationResult};
 use std::{
     fs::File,
     io::Write,
@@ -17,11 +17,12 @@ impl Share {
         self.cases.lock().unwrap().pop()
     }
 
-    fn submit_result(&self, case: String, res: Option<Duration>) {
+    fn submit_result(&self, case: String, res: EvaluationResult) {
         dbg!(res);
         let out_time = match res {
-            Some(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
-            None => "None".to_string(),
+            EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
+            EvaluationResult::Timeout => "Timeout".to_string(),
+            EvaluationResult::Failed => "Failed".to_string(),
         };
         let out = format!("{} {}\n", case, out_time);
         self.res_file
