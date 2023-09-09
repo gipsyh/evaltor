@@ -1,14 +1,16 @@
+mod worker;
+
 use chrono::Local;
 use std::{
     fs::{read_dir, File},
-    io::Write,
     path::Path,
     process::Command,
-    sync::Arc,
+    sync::{Arc, Mutex},
     thread::spawn,
     time::{Duration, Instant},
 };
 use wait_timeout::ChildExt;
+use worker::{Share, Worker};
 
 pub struct Benchmark {
     path: String,
@@ -45,6 +47,7 @@ pub struct Evaluation {
     benchmark: Benchmark,
     evaluatees: Vec<Arc<dyn Evaluatee>>,
     timeout: Duration,
+    test_cores: usize,
 }
 
 impl Evaluation {
@@ -53,11 +56,16 @@ impl Evaluation {
             benchmark,
             evaluatees: Vec::new(),
             timeout: Duration::from_secs(1000),
+            test_cores: 1,
         }
     }
 
     pub fn set_timeout(&mut self, timeout: Duration) {
         self.timeout = timeout
+    }
+
+    pub fn set_test_cores(&mut self, test_cores: usize) {
+        self.test_cores = test_cores
     }
 
     pub fn add_evaluatee(&mut self, evaluatee: impl Evaluatee + 'static) {
@@ -71,20 +79,19 @@ impl Evaluation {
                 evaluatee.name(),
                 Local::now().format("%m-%d-%H-%M")
             );
-            let mut result = File::create(Path::new(&result_file)).unwrap();
-            for case in self.benchmark.caces() {
-                let evaluatee = evaluatee.clone();
-                let timeout = self.timeout.clone();
-                let case_clone = case.clone();
-                let join = spawn(move || evaluatee.evaluate(&case_clone, timeout));
-                let time = join.join().unwrap();
-                let out_time = match time {
-                    Some(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
-                    None => "None".to_string(),
-                };
-                let out = format!("{} {}\n", case, out_time);
-                result.write_all(out.as_bytes()).unwrap();
-                dbg!(time);
+            let res_file = File::create(Path::new(&result_file)).unwrap();
+            let share = Arc::new(Share {
+                cases: Mutex::new(self.benchmark.caces().collect()),
+                res_file: Mutex::new(res_file),
+                timeout: self.timeout,
+            });
+            let mut joins = Vec::new();
+            for _ in 0..self.test_cores {
+                let worker = Worker::new(evaluatee.clone(), share.clone());
+                joins.push(spawn(|| worker.start()));
+            }
+            for join in joins {
+                join.join().unwrap();
             }
         }
     }
@@ -119,7 +126,11 @@ impl Evaluatee for AbcPdrCtp {
 
     fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
         let path = format!("read {path}; pdr -s -v");
-        let mut child = Command::new("/root/abc/abc").arg("-c").arg(path).spawn().unwrap();
+        let mut child = Command::new("/root/abc/abc")
+            .arg("-c")
+            .arg(path)
+            .spawn()
+            .unwrap();
         let start = Instant::now();
         if let Ok(Some(_)) = child.wait_timeout(timeout) {
             Some(start.elapsed())
@@ -152,13 +163,36 @@ impl Evaluatee for Pic3 {
     }
 }
 
+struct MyIc3;
+
+impl Evaluatee for MyIc3 {
+    fn name(&self) -> String {
+        "myic3".to_string()
+    }
+
+    fn evaluate(&self, path: &str, timeout: Duration) -> Option<Duration> {
+        let mut child = Command::new("/root/ic3/target/release/ic3")
+            .arg(path)
+            .spawn()
+            .unwrap();
+        let start = Instant::now();
+        if let Ok(Some(_)) = child.wait_timeout(timeout) {
+            Some(start.elapsed())
+        } else {
+            child.kill().unwrap();
+            None
+        }
+    }
+}
+
 fn main() {
     let path = "/root/MC-Benchmark/hwmcc17/single";
-    let suffix = ".aig";
+    let suffix = ".aag";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(300));
+    evaluation.set_timeout(Duration::from_secs(10));
     evaluation.add_evaluatee(AbcPdrCtp);
+    evaluation.set_test_cores(16);
     evaluation.evaluate();
 }
