@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    files = ["result/abc-pdr-ctp-09-07-21-08", "result/abc-pdr-08-31-16-20"]
+    files = ["result/myic3-09-10-01-57"]
     for file in files:
         data = []
         with open(file, "r") as file:
