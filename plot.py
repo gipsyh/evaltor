@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
+import sys
 
 if __name__ == "__main__":
-    files = ["result/myic3-09-10-01-57"]
-    for file in files:
+    for file in sys.argv[1:]:
         data = []
         with open(file, "r") as file:
             for line in file:
                 model, time = line.strip().split()
-                if time != "None":
+                if time != "Timeout" and time != "Failed":
                     print(time)
                     data.append(float(time))
         data = sorted(data)
