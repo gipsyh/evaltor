@@ -1,7 +1,7 @@
 use crate::{command_evaluate, Evaluatee, EvaluationResult};
 use std::{process::Command, time::Duration};
 
-struct AbcPdr;
+pub struct AbcPdr;
 
 impl Evaluatee for AbcPdr {
     fn name(&self) -> String {
