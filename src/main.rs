@@ -2,7 +2,6 @@ mod evaluatees;
 mod worker;
 
 use chrono::Local;
-use evaluatees::myic3::MyIc3;
 use std::{
     fs::{read_dir, File},
     path::Path,
@@ -27,15 +26,26 @@ impl Benchmark {
         }
     }
 
-    pub fn caces(&self) -> impl Iterator<Item = String> + '_ {
-        read_dir(&self.path).unwrap().filter_map(|entry| {
-            if let Some(file_name) = entry.ok()?.path().to_str() {
-                if file_name.ends_with(&self.suffix) {
-                    return Some(file_name.to_owned());
+    fn inner_cases(&self, path: &str) -> Vec<String> {
+        let mut cases = Vec::new();
+        for entry in read_dir(path).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_file() {
+                if let Some(extension) = path.extension() {
+                    if extension.eq_ignore_ascii_case(&self.suffix) {
+                        cases.push(path.to_str().unwrap().to_string());
+                    }
                 }
+            } else if path.is_dir() {
+                let sub_cases = self.inner_cases(path.to_str().unwrap());
+                cases.extend(sub_cases);
             }
-            None
-        })
+        }
+        cases
+    }
+
+    pub fn caces(&self) -> Vec<String> {
+        self.inner_cases(&self.path)
     }
 }
 
@@ -90,7 +100,7 @@ impl Evaluation {
             );
             let res_file = File::create(Path::new(&result_file)).unwrap();
             let share = Arc::new(Share {
-                cases: Mutex::new(self.benchmark.caces().collect()),
+                cases: Mutex::new(self.benchmark.caces()),
                 res_file: Mutex::new(res_file),
                 timeout: self.timeout,
             });
@@ -122,13 +132,14 @@ fn command_evaluate(mut command: Command, timeout: Duration) -> EvaluationResult
 }
 
 fn main() {
-    let path = "/root/MC-Benchmark/hwmcc17/single";
-    let suffix = ".aag";
+    // let path = "/root/MC-Benchmark/hwmcc17/single";
+    let path = "/root/MC-Benchmark/hwmcc20/aig/";
+    let suffix = "aag";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.add_evaluatee(MyIc3);
+    evaluation.set_timeout(Duration::from_secs(5));
+    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.set_test_cores(16);
     evaluation.evaluate();
 }
