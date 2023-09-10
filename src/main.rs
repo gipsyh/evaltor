@@ -1,6 +1,8 @@
+mod evaluatees;
 mod worker;
 
 use chrono::Local;
+use evaluatees::myic3::MyIc3;
 use std::{
     fs::{read_dir, File},
     path::Path,
@@ -104,107 +106,18 @@ impl Evaluation {
     }
 }
 
-struct AbcPdr;
-
-impl Evaluatee for AbcPdr {
-    fn name(&self) -> String {
-        "abc-pdr".to_string()
-    }
-
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
-        let path = format!("read {path}; pdr -v");
-        let mut child = Command::new("abc").arg("-c").arg(path).spawn().unwrap();
-        let start = Instant::now();
-        if let Ok(Some(status)) = child.wait_timeout(timeout) {
-            if status.success() {
-                EvaluationResult::Success(start.elapsed())
-            } else {
-                EvaluationResult::Failed
-            }
+fn command_evaluate(mut command: Command, timeout: Duration) -> EvaluationResult {
+    let mut child = command.spawn().unwrap();
+    let start = Instant::now();
+    if let Ok(Some(status)) = child.wait_timeout(timeout) {
+        if status.success() {
+            EvaluationResult::Success(start.elapsed())
         } else {
-            child.kill().unwrap();
-            EvaluationResult::Timeout
+            EvaluationResult::Failed
         }
-    }
-}
-
-struct AbcPdrCtp;
-
-impl Evaluatee for AbcPdrCtp {
-    fn name(&self) -> String {
-        "abc-pdr-ctp".to_string()
-    }
-
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
-        let path = format!("read {path}; pdr -s -v");
-        let mut child = Command::new("/root/abc/abc")
-            .arg("-c")
-            .arg(path)
-            .spawn()
-            .unwrap();
-        let start = Instant::now();
-        if let Ok(Some(status)) = child.wait_timeout(timeout) {
-            if status.success() {
-                EvaluationResult::Success(start.elapsed())
-            } else {
-                EvaluationResult::Failed
-            }
-        } else {
-            child.kill().unwrap();
-            EvaluationResult::Timeout
-        }
-    }
-}
-
-struct Pic3;
-
-impl Evaluatee for Pic3 {
-    fn name(&self) -> String {
-        "pic3".to_string()
-    }
-
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
-        let mut child = Command::new("/root/pic3/target/release/pic3-demo")
-            .arg(path)
-            .spawn()
-            .unwrap();
-        let start = Instant::now();
-        if let Ok(Some(status)) = child.wait_timeout(timeout) {
-            if status.success() {
-                EvaluationResult::Success(start.elapsed())
-            } else {
-                EvaluationResult::Failed
-            }
-        } else {
-            child.kill().unwrap();
-            EvaluationResult::Timeout
-        }
-    }
-}
-
-struct MyIc3;
-
-impl Evaluatee for MyIc3 {
-    fn name(&self) -> String {
-        "myic3".to_string()
-    }
-
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
-        let mut child = Command::new("/root/ic3/target/release/ic3")
-            .arg(path)
-            .spawn()
-            .unwrap();
-        let start = Instant::now();
-        if let Ok(Some(status)) = child.wait_timeout(timeout) {
-            if status.success() {
-                EvaluationResult::Success(start.elapsed())
-            } else {
-                EvaluationResult::Failed
-            }
-        } else {
-            child.kill().unwrap();
-            EvaluationResult::Timeout
-        }
+    } else {
+        child.kill().unwrap();
+        EvaluationResult::Timeout
     }
 }
 
