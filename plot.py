@@ -8,7 +8,6 @@ if __name__ == "__main__":
             for line in file:
                 model, time = line.strip().split()
                 if time != "Timeout" and time != "Failed":
-                    print(time)
                     data.append(float(time))
         data = sorted(data)
         plt.plot(range(len(data)), data, marker="x")
