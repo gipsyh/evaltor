@@ -135,12 +135,12 @@ fn main() {
     // let path = "/root/MC-Benchmark/hwmcc17/single";
     // let path = "/root/MC-Benchmark/hwmcc20/aig/";
     let path = "/root/MC-Benchmark/hwmcc-appr";
-    let suffix = "aag";
+    let suffix = "aig";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
     evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.add_evaluatee(evaluatees::pic3::Pic3);
-    evaluation.set_test_cores(3);
+    evaluation.add_evaluatee(evaluatees::abcpdr::AbcPdr);
+    evaluation.set_test_cores(16);
     evaluation.evaluate();
 }
