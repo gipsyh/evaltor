@@ -135,7 +135,7 @@ fn main() {
     // let path = "/root/MC-Benchmark/hwmcc17/single";
     // let path = "/root/MC-Benchmark/hwmcc20/aig/";
     let path = "/root/MC-Benchmark/hwmcc-appr";
-    let suffix = "aag";
+    let suffix = "aig";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
