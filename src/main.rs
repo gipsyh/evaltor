@@ -132,14 +132,15 @@ fn command_evaluate(mut command: Command, timeout: Duration) -> EvaluationResult
 }
 
 fn main() {
-    let path = "/root/MC-Benchmark/hwmcc17/single";
+    // let path = "/root/MC-Benchmark/hwmcc17/single";
     // let path = "/root/MC-Benchmark/hwmcc20/aig/";
+    let path = "/root/MC-Benchmark/pic3";
     let suffix = "aag";
 
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
     evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.add_evaluatee(evaluatees::pic3::Pic3);
-    evaluation.set_test_cores(3);
+    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
+    evaluation.set_test_cores(16);
     evaluation.evaluate();
 }
