@@ -132,9 +132,9 @@ fn command_evaluate(mut command: Command, timeout: Duration) -> EvaluationResult
 }
 
 fn main() {
-    // let path = "/root/MC-Benchmark/hwmcc17/single";
+    let path = "/root/MC-Benchmark/hwmcc17/single";
     // let path = "/root/MC-Benchmark/hwmcc20/aig/";
-    let path = "/root/MC-Benchmark/hwmcc-appr";
+    // let path = "/root/MC-Benchmark/hwmcc-appr";
     let suffix = "aag";
 
     let benchmark = Benchmark::new(path, suffix);
