@@ -11,6 +11,7 @@ impl Evaluatee for Ic3Ref {
     fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
         let mut command = Command::new("/root/IC3ref/build/ic3refmain");
         command.arg("-s");
+        command.arg("-b");
         let file = File::open(path).unwrap();
         command.stdin(file);
         command_evaluate(command, timeout)
