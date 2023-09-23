@@ -41,6 +41,7 @@ impl Benchmark {
                 cases.extend(sub_cases);
             }
         }
+        cases.sort();
         cases
     }
 
@@ -140,7 +141,7 @@ fn main() {
     let benchmark = Benchmark::new(path, suffix);
     let mut evaluation = Evaluation::new(benchmark);
     evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.add_evaluatee(evaluatees::ic3ref::Ic3Ref);
+    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.set_test_cores(16);
     evaluation.evaluate();
 }
