@@ -9,7 +9,7 @@ impl Evaluatee for AbcPdr {
     }
 
     fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
-        let path = format!("read {path}; pdr -S 1238012");
+        let path = format!("read {path}; pdr");
         let mut command = Command::new("/root/abc/build/abc");
         command.arg("-c").arg(path);
         command_evaluate(command, timeout)
