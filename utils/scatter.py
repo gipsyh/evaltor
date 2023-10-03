@@ -27,8 +27,12 @@ if __name__ == "__main__":
     Y = []
     keys = sorted(data.keys())
     for key in keys:
-        X.append(parse_time(data[key][0]))
-        Y.append(parse_time(data[key][1]))
+        x = parse_time(data[key][0])
+        y = parse_time(data[key][1])
+        if x <= 1 and y <= 1:
+            continue
+        X.append(x)
+        Y.append(y)
     
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
@@ -36,7 +40,7 @@ if __name__ == "__main__":
     plt.xlabel(name[0])
     plt.ylabel(name[1])
     plt.plot([0, 1000], [0, 1000], linestyle='dashed', color='grey')
-    plt.xlim(1, 1000)
-    plt.ylim(1, 1000)
+    # plt.xlim(1, 1000)
+    # plt.ylim(1, 1000)
     plt.show()
     plt.savefig("scatter.png")
