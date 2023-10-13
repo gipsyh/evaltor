@@ -25,15 +25,22 @@ if __name__ == "__main__":
 
     X = []
     Y = []
+    num_x = 0
+    num_y = 0
     keys = sorted(data.keys())
     for key in keys:
         x = parse_time(data[key][0])
         y = parse_time(data[key][1])
         if x <= 1 and y <= 1:
             continue
+        if x < y:
+            num_x += 1
+        elif x > y:
+            num_y += 1
         X.append(x)
         Y.append(y)
     
+    print((num_x, num_y))
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
     plt.yscale('log')
