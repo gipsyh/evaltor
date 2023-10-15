@@ -6,7 +6,10 @@ def parse_time(time):
     if time == "Timeout":
         return 1000
     else:
-        return float(time)
+        time = float(time)
+        if time < 0.01:
+            time = 0.01
+        return time
 
 if __name__ == "__main__":
     data = {}
@@ -29,6 +32,8 @@ if __name__ == "__main__":
     num_y = 0
     keys = sorted(data.keys())
     for key in keys:
+        if len(data[key]) < 2:
+            continue
         x = parse_time(data[key][0])
         y = parse_time(data[key][1])
         if x <= 1 and y <= 1:
@@ -47,7 +52,7 @@ if __name__ == "__main__":
     plt.xlabel(name[0])
     plt.ylabel(name[1])
     plt.plot([0, 1000], [0, 1000], linestyle='dashed', color='grey')
-    # plt.xlim(1, 1000)
-    # plt.ylim(1, 1000)
+    plt.xlim(0.009, 1100)
+    plt.ylim(0.009, 1100)
     plt.show()
     plt.savefig("scatter.png")
