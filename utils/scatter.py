@@ -52,7 +52,5 @@ if __name__ == "__main__":
     plt.xlabel(name[0])
     plt.ylabel(name[1])
     plt.plot([0, 1000], [0, 1000], linestyle='dashed', color='grey')
-    plt.xlim(0.009, 1100)
-    plt.ylim(0.009, 1100)
     plt.show()
     plt.savefig("scatter.png")
