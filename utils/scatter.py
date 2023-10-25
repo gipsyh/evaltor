@@ -2,9 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+timeout = 1000
+
 def parse_time(time):
     if time == "Timeout":
-        return 1000
+        return timeout
+    elif time == "Failed":
+        return timeout
     else:
         time = float(time)
         if time < 0.01:
@@ -51,6 +55,6 @@ if __name__ == "__main__":
     plt.yscale('log')
     plt.xlabel(name[0])
     plt.ylabel(name[1])
-    plt.plot([0, 1000], [0, 1000], linestyle='dashed', color='grey')
+    plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
     plt.show()
     plt.savefig("scatter.png")
