@@ -10,6 +10,7 @@ pub struct Share {
     pub cases: Mutex<Vec<String>>,
     pub res_file: Mutex<File>,
     pub timeout: Duration,
+    pub memory_limit: usize,
 }
 
 impl Share {
@@ -45,7 +46,9 @@ impl Worker {
 
     pub fn start(self) {
         while let Some(case) = self.share.get_case() {
-            let res = self.evaluatee.evaluate(&case, self.share.timeout);
+            let res = self
+                .evaluatee
+                .evaluate(&case, self.share.timeout, self.share.memory_limit);
             self.share.submit_result(case, res);
         }
     }

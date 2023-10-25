@@ -8,13 +8,10 @@ impl Evaluatee for Ic3Ref {
         "ic3ref".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
+    fn evaluate(&self, path: &str, timeout: Duration, memory_limit: usize) -> EvaluationResult {
         let mut command = Command::new("/root/IC3ref/build/ic3refmain");
-        command.arg("-s");
-        command.arg("-r");
-        command.arg("-b");
         let file = File::open(path).unwrap();
         command.stdin(file);
-        command_evaluate(command, timeout)
+        command_evaluate(command, timeout, memory_limit)
     }
 }

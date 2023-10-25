@@ -8,9 +8,9 @@ impl Evaluatee for Pic3 {
         "pic3".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration) -> EvaluationResult {
+    fn evaluate(&self, path: &str, timeout: Duration, memory_limit: usize) -> EvaluationResult {
         let mut command = Command::new("/root/pic3/target/release/pic3-demo");
         command.arg(path);
-        command_evaluate(command, timeout)
+        command_evaluate(command, timeout, memory_limit)
     }
 }
