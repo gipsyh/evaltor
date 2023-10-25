@@ -153,16 +153,16 @@ fn command_evaluate(
 }
 
 fn main() {
-    let name = "hwmcc15";
-    let path = "/root/MC-Benchmark/hwmcc15";
-    // let path = "/root/MC-Benchmark/hwmcc17/single";
-    // let path = "/root/MC-Benchmark/hwmcc20/aig/2019/goel/";
-    // let path = "/root/MC-Benchmark/hwmcc-appr";
     let suffix = "aag";
+    #[allow(unused)]
+    let hwmcc15 = Benchmark::new("hwmcc15", "/root/MC-Benchmark/hwmcc15", suffix);
+    #[allow(unused)]
+    let hwmcc17 = Benchmark::new("hwmcc17", "/root/MC-Benchmark/hwmcc17/single", suffix);
+    #[allow(unused)]
+    let hwmcc_appr = Benchmark::new("hwmcc_appr", "/root/MC-Benchmark/hwmcc-appr", suffix);
 
-    let benchmark = Benchmark::new(name, path, suffix);
-    let mut evaluation = Evaluation::new(benchmark);
-    evaluation.set_timeout(Duration::from_secs(2000));
+    let mut evaluation = Evaluation::new(hwmcc_appr);
+    evaluation.set_timeout(Duration::from_secs(500));
     evaluation.set_memory_limit(2 * 1024 * 1024 * 1024);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.set_test_cores(16);
