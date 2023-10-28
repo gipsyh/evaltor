@@ -1,14 +1,17 @@
 use crate::{Evaluatee, EvaluationResult};
+use process_control::{ChildExt, Control};
 use std::{
     fs::File,
-    io::Write,
+    io::{self, Read, Write},
+    process::{Command, Stdio},
     sync::{Arc, Mutex},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 pub struct Share {
     pub cases: Mutex<Vec<String>>,
     pub res_file: Mutex<File>,
+    pub log_file: Mutex<File>,
     pub timeout: Duration,
     pub memory_limit: usize,
 }
@@ -19,7 +22,7 @@ impl Share {
     }
 
     fn submit_result(&self, case: String, res: EvaluationResult) {
-        dbg!(res);
+        println!("{:?}", res);
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
             EvaluationResult::Timeout => "Timeout".to_string(),
@@ -31,6 +34,10 @@ impl Share {
             .unwrap()
             .write_all(out.as_bytes())
             .unwrap();
+    }
+
+    fn submit_log<R: Read>(&self, mut log: R) {
+        let _ = io::copy(&mut log, &mut *self.log_file.lock().unwrap());
     }
 }
 
@@ -44,12 +51,39 @@ impl Worker {
         Self { evaluatee, share }
     }
 
+    fn evaluate(&self, case: String, mut command: Command) {
+        command.stdout(Stdio::piped());
+        let mut child = command.spawn().unwrap();
+        let start = Instant::now();
+        let output = child
+            .controlled()
+            .time_limit(self.share.timeout)
+            .memory_limit(self.share.memory_limit)
+            .wait()
+            .unwrap();
+        let time = start.elapsed();
+        let res = if let Some(status) = output {
+            if status.success() {
+                EvaluationResult::Success(time)
+            } else {
+                EvaluationResult::Failed
+            }
+        } else {
+            nix::sys::signal::kill(
+                nix::unistd::Pid::from_raw(child.id() as i32),
+                nix::sys::signal::Signal::SIGINT,
+            )
+            .unwrap();
+            EvaluationResult::Timeout
+        };
+        self.share.submit_log(child.stdout.take().unwrap());
+        self.share.submit_result(case, res);
+    }
+
     pub fn start(self) {
         while let Some(case) = self.share.get_case() {
-            let res = self
-                .evaluatee
-                .evaluate(&case, self.share.timeout, self.share.memory_limit);
-            self.share.submit_result(case, res);
+            let command = self.evaluatee.evaluate(&case);
+            self.evaluate(case, command);
         }
     }
 }

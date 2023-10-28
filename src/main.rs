@@ -2,14 +2,13 @@ mod evaluatees;
 mod worker;
 
 use chrono::Local;
-use process_control::{ChildExt, Control};
 use std::{
     fs::{read_dir, File},
     path::Path,
     process::Command,
     sync::{Arc, Mutex},
     thread::spawn,
-    time::{Duration, Instant},
+    time::Duration,
 };
 use worker::{Share, Worker};
 
@@ -62,7 +61,7 @@ pub enum EvaluationResult {
 pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
-    fn evaluate(&self, path: &str, timeout: Duration, memory_limit: usize) -> EvaluationResult;
+    fn evaluate(&self, path: &str) -> Command;
 }
 
 pub struct Evaluation {
@@ -108,10 +107,13 @@ impl Evaluation {
                 self.benchmark.name,
                 Local::now().format("%m-%d-%H-%M")
             );
+            let log_file = format!("{}.log", result_file);
             let res_file = File::create(Path::new(&result_file)).unwrap();
+            let log_file = File::create(Path::new(&log_file)).unwrap();
             let share = Arc::new(Share {
                 cases: Mutex::new(self.benchmark.caces()),
                 res_file: Mutex::new(res_file),
+                log_file: Mutex::new(log_file),
                 timeout: self.timeout,
                 memory_limit: self.memory_limit,
             });
@@ -127,31 +129,6 @@ impl Evaluation {
     }
 }
 
-fn command_evaluate(
-    mut command: Command,
-    timeout: Duration,
-    memory_limit: usize,
-) -> EvaluationResult {
-    let child = command.spawn().unwrap();
-    let start = Instant::now();
-    let output = child
-        .controlled_with_output()
-        .time_limit(timeout)
-        .terminate_for_timeout()
-        .memory_limit(memory_limit)
-        .wait()
-        .unwrap();
-    if let Some(output) = output {
-        if output.status.success() {
-            EvaluationResult::Success(start.elapsed())
-        } else {
-            EvaluationResult::Failed
-        }
-    } else {
-        EvaluationResult::Timeout
-    }
-}
-
 fn main() {
     let suffix = "aag";
     #[allow(unused)]
@@ -163,7 +140,7 @@ fn main() {
 
     let mut evaluation = Evaluation::new(hwmcc_appr);
     evaluation.set_timeout(Duration::from_secs(500));
-    evaluation.set_memory_limit(2 * 1024 * 1024 * 1024);
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 2);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.set_test_cores(16);
     evaluation.evaluate();

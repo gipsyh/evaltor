@@ -1,5 +1,5 @@
-use crate::{command_evaluate, Evaluatee, EvaluationResult};
-use std::{process::Command, time::Duration};
+use crate::Evaluatee;
+use std::process::Command;
 
 pub struct AbcPdr;
 
@@ -8,10 +8,10 @@ impl Evaluatee for AbcPdr {
         "abc-pdr".to_string()
     }
 
-    fn evaluate(&self, path: &str, timeout: Duration, memory_limit: usize) -> EvaluationResult {
+    fn evaluate(&self, path: &str) -> Command {
         let path = format!("read {path}; pdr");
         let mut command = Command::new("/root/abc/build/abc");
         command.arg("-c").arg(path);
-        command_evaluate(command, timeout, memory_limit)
+        command
     }
 }
