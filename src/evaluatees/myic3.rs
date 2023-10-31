@@ -9,7 +9,7 @@ impl Evaluatee for MyIc3 {
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("/root/ic3/target/release/ic3");
+        let mut command = Command::new("../ic3/target/release/ic3");
         command.arg(path);
         command
     }

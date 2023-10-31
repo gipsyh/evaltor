@@ -10,7 +10,7 @@ impl Evaluatee for AbcPdr {
 
     fn evaluate(&self, path: &str) -> Command {
         let path = format!("read {path}; pdr");
-        let mut command = Command::new("/root/abc/build/abc");
+        let mut command = Command::new("../abc/build/abc");
         command.arg("-c").arg(path);
         command
     }

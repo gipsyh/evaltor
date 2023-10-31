@@ -9,7 +9,7 @@ impl Evaluatee for Pic3 {
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("/root/pic3/target/release/pic3-demo");
+        let mut command = Command::new("../pic3/target/release/pic3-demo");
         command.arg(path);
         command
     }

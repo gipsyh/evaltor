@@ -78,7 +78,7 @@ impl Evaluation {
             benchmark,
             evaluatees: Vec::new(),
             timeout: Duration::from_secs(1000),
-            test_cores: 1,
+            test_cores: num_cpus::get(),
             memory_limit: 1024 * 1024 * 1024,
         }
     }
@@ -129,19 +129,17 @@ impl Evaluation {
     }
 }
 
+#[allow(unused)]
 fn main() {
     let suffix = "aag";
-    #[allow(unused)]
-    let hwmcc15 = Benchmark::new("hwmcc15", "/root/MC-Benchmark/hwmcc15", suffix);
-    #[allow(unused)]
-    let hwmcc17 = Benchmark::new("hwmcc17", "/root/MC-Benchmark/hwmcc17/single", suffix);
-    #[allow(unused)]
-    let hwmcc_appr = Benchmark::new("hwmcc_appr", "/root/MC-Benchmark/hwmcc-appr", suffix);
+    let hwmcc15 = Benchmark::new("hwmcc15", "../MC-Benchmark/hwmcc15", suffix);
+    let hwmcc17 = Benchmark::new("hwmcc17", "../MC-Benchmark/hwmcc17/single", suffix);
+    let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);
+    let hwmcc_appr = Benchmark::new("hwmcc_appr", "../MC-Benchmark/hwmcc-appr", suffix);
 
     let mut evaluation = Evaluation::new(hwmcc_appr);
-    evaluation.set_timeout(Duration::from_secs(500));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 2);
-    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
-    evaluation.set_test_cores(16);
+    evaluation.set_timeout(Duration::from_secs(1000));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 8);
+    evaluation.add_evaluatee(evaluatees::ic3ref::Ic3Ref);
     evaluation.evaluate();
 }
