@@ -61,6 +61,8 @@ pub enum EvaluationResult {
 pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
+    fn version(&self) -> String;
+
     fn evaluate(&self, path: &str) -> Command;
 }
 
@@ -102,10 +104,11 @@ impl Evaluation {
     pub fn evaluate(&mut self) {
         for evaluatee in self.evaluatees.iter() {
             let result_file = format!(
-                "result/{}-{}-{}",
+                "result/{}-{}-{}-{}",
                 evaluatee.name(),
                 self.benchmark.name,
-                Local::now().format("%m-%d-%H-%M")
+                Local::now().format("%m%d%H%M"),
+                evaluatee.version(),
             );
             let log_file = format!("{}.log", result_file);
             let res_file = File::create(Path::new(&result_file)).unwrap();
@@ -137,9 +140,9 @@ fn main() {
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../MC-Benchmark/hwmcc-appr", suffix);
 
-    let mut evaluation = Evaluation::new(hwmcc_appr);
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 8);
-    evaluation.add_evaluatee(evaluatees::ic3ref::Ic3Ref);
+    let mut evaluation = Evaluation::new(hwmcc1517);
+    evaluation.set_timeout(Duration::from_secs(2000));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
+    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.evaluate();
 }
