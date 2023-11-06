@@ -5,7 +5,7 @@ pub struct AbcPdr;
 
 impl Evaluatee for AbcPdr {
     fn name(&self) -> String {
-        "abc-pdr".to_string()
+        "abcpdr".to_string()
     }
 
     fn version(&self) -> String {
