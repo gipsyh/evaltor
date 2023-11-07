@@ -19,4 +19,4 @@ if __name__ == "__main__":
     plt.ylabel("time")
     plt.legend()
     plt.show()
-    plt.savefig("result.png", dpi=1000)
+    plt.savefig("result.png", dpi=500)

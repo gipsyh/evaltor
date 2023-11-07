@@ -59,4 +59,4 @@ if __name__ == "__main__":
     plt.ylabel(name[1])
     plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
     plt.show()
-    plt.savefig("scatter.png", dpi=1000)
+    plt.savefig("scatter.png", dpi=500)
