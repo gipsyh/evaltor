@@ -12,11 +12,11 @@ if __name__ == "__main__":
                     data.append(float(time))
         data = sorted(data)
         print(file_name, len(data))
-        plt.plot(range(len(data)), data, marker="x", label = file_name)
+        plt.plot(range(len(data)), data, marker="x", label=file_name)
 
     plt.title("result")
     plt.xlabel("solved")
     plt.ylabel("time")
     plt.legend()
     plt.show()
-    plt.savefig("result.png", dpi = 1000)
+    plt.savefig("result.png", dpi=1000)

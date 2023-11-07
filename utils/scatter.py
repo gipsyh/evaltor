@@ -4,6 +4,7 @@ import sys
 
 timeout = 1000
 
+
 def parse_time(time):
     if time == "Timeout":
         return timeout
@@ -14,6 +15,7 @@ def parse_time(time):
         if time < 0.01:
             time = 0.01
         return time
+
 
 if __name__ == "__main__":
     data = {}
@@ -48,7 +50,7 @@ if __name__ == "__main__":
             num_y += 1
         X.append(x)
         Y.append(y)
-    
+
     print((num_x, num_y))
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
@@ -57,4 +59,4 @@ if __name__ == "__main__":
     plt.ylabel(name[1])
     plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
     plt.show()
-    plt.savefig("scatter.png", dpi = 1000)
+    plt.savefig("scatter.png", dpi=1000)
