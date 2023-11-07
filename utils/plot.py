@@ -8,8 +8,10 @@ if __name__ == "__main__":
             for line in file:
                 model, time = line.strip().split()
                 if time != "Timeout" and time != "Failed":
+                    t = float(time)
                     data.append(float(time))
         data = sorted(data)
+        print(file_name, len(data))
         plt.plot(range(len(data)), data, marker="x", label = file_name)
 
     plt.title("result")
