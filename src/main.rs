@@ -103,14 +103,15 @@ impl Evaluation {
 
     pub fn evaluate(&mut self) {
         for evaluatee in self.evaluatees.iter() {
-            let result_file = format!(
+            let file = format!(
                 "result/{}-{}-{}-{}",
                 evaluatee.name(),
                 self.benchmark.name,
                 Local::now().format("%m%d%H%M"),
                 evaluatee.version(),
             );
-            let log_file = format!("{}.log", result_file);
+            let result_file = format!("{}.txt", file);
+            let log_file = format!("{}.log", file);
             let res_file = File::create(Path::new(&result_file)).unwrap();
             let log_file = File::create(Path::new(&log_file)).unwrap();
             let share = Arc::new(Share {
