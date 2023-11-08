@@ -2,14 +2,7 @@ mod evaluatees;
 mod worker;
 
 use chrono::Local;
-use std::{
-    fs::{read_dir, File},
-    path::Path,
-    process::Command,
-    sync::{Arc, Mutex},
-    thread::spawn,
-    time::Duration,
-};
+use std::{fs::read_dir, process::Command, sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
 
 pub struct Benchmark {
@@ -110,17 +103,12 @@ impl Evaluation {
                 Local::now().format("%m%d%H%M"),
                 evaluatee.version(),
             );
-            let result_file = format!("{}.txt", file);
-            let log_file = format!("{}.log", file);
-            let res_file = File::create(Path::new(&result_file)).unwrap();
-            let log_file = File::create(Path::new(&log_file)).unwrap();
-            let share = Arc::new(Share {
-                cases: Mutex::new(self.benchmark.caces()),
-                res_file: Mutex::new(res_file),
-                log_file: Mutex::new(log_file),
-                timeout: self.timeout,
-                memory_limit: self.memory_limit,
-            });
+            let share = Arc::new(Share::new(
+                self.benchmark.caces(),
+                file,
+                self.timeout,
+                self.memory_limit,
+            ));
             let mut joins = Vec::new();
             for _ in 0..self.test_cores {
                 let worker = Worker::new(evaluatee.clone(), share.clone());
@@ -129,6 +117,7 @@ impl Evaluation {
             for join in joins {
                 join.join().unwrap();
             }
+            share.pb.lock().unwrap().finish();
         }
     }
 }
@@ -141,7 +130,7 @@ fn main() {
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../MC-Benchmark/hwmcc-appr", suffix);
 
-    let mut evaluation = Evaluation::new(hwmcc1517);
+    let mut evaluation = Evaluation::new(hwmcc_appr);
     evaluation.set_timeout(Duration::from_secs(2000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);

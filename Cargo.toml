@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.28"
+indicatif = "0.17.7"
 libc = "0.2.147"
 nix = { version = "0.27.1", features = ["signal"] }
 num_cpus = "1.16.0"
