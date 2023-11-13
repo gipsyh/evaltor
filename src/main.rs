@@ -117,21 +117,20 @@ impl Evaluation {
             for join in joins {
                 join.join().unwrap();
             }
-            share.pb.lock().unwrap().finish();
         }
     }
 }
 
 #[allow(unused)]
 fn main() {
-    let suffix = "aag";
+    let suffix = "aig";
     let hwmcc15 = Benchmark::new("hwmcc15", "../MC-Benchmark/hwmcc15", suffix);
     let hwmcc17 = Benchmark::new("hwmcc17", "../MC-Benchmark/hwmcc17/single", suffix);
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../MC-Benchmark/hwmcc-appr", suffix);
 
-    let mut evaluation = Evaluation::new(hwmcc_appr);
-    evaluation.set_timeout(Duration::from_secs(2000));
+    let mut evaluation = Evaluation::new(hwmcc1517);
+    evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.evaluate();

@@ -10,11 +10,15 @@ use std::{
     time::{Duration, Instant},
 };
 
+struct RaceShare {
+    cases: Vec<String>,
+    res_file: File,
+    log_file: File,
+    pb: ProgressBar,
+}
+
 pub struct Share {
-    cases: Mutex<Vec<String>>,
-    res_file: Mutex<File>,
-    log_file: Mutex<File>,
-    pub pb: Mutex<ProgressBar>,
+    race: Mutex<RaceShare>,
     timeout: Duration,
     memory_limit: usize,
 }
@@ -23,8 +27,8 @@ impl Share {
     pub fn new(cases: Vec<String>, file: String, timeout: Duration, memory_limit: usize) -> Self {
         let result_file = format!("{}.txt", file);
         let log_file = format!("{}.log", file);
-        let res_file = Mutex::new(File::create(Path::new(&result_file)).unwrap());
-        let log_file = Mutex::new(File::create(Path::new(&log_file)).unwrap());
+        let res_file = File::create(Path::new(&result_file)).unwrap();
+        let log_file = File::create(Path::new(&log_file)).unwrap();
         let pb = indicatif::ProgressBar::new(cases.len() as _);
         pb.set_style(
             indicatif::ProgressStyle::with_template(
@@ -34,36 +38,38 @@ impl Share {
             .progress_chars("#>-"),
         );
         Self {
-            cases: Mutex::new(cases),
-            res_file,
-            log_file,
-            pb: Mutex::new(pb),
+            race: Mutex::new(RaceShare {
+                cases,
+                res_file,
+                log_file,
+                pb,
+            }),
             timeout,
             memory_limit,
         }
     }
 
     fn get_case(&self) -> Option<String> {
-        self.cases.lock().unwrap().pop()
+        self.race.lock().unwrap().cases.pop()
     }
 
-    fn submit_result(&self, case: String, res: EvaluationResult) {
+    fn submit_result<R: Read>(&self, case: String, res: EvaluationResult, mut log: R) {
+        let mut race = self.race.lock().unwrap();
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
         };
         let out = format!("{} {}\n", case, out_time);
-        self.res_file
-            .lock()
-            .unwrap()
-            .write_all(out.as_bytes())
-            .unwrap();
-        self.pb.lock().unwrap().inc(1);
+        race.res_file.write_all(out.as_bytes()).unwrap();
+        race.pb.inc(1);
+        let _ = io::copy(&mut log, &mut race.log_file);
     }
+}
 
-    fn submit_log<R: Read>(&self, mut log: R) {
-        let _ = io::copy(&mut log, &mut *self.log_file.lock().unwrap());
+impl Drop for Share {
+    fn drop(&mut self) {
+        self.race.lock().unwrap().pb.finish();
     }
 }
 
@@ -102,8 +108,8 @@ impl Worker {
             .unwrap();
             EvaluationResult::Timeout
         };
-        self.share.submit_log(child.stdout.take().unwrap());
-        self.share.submit_result(case, res);
+        self.share
+            .submit_result(case, res, child.stdout.take().unwrap());
     }
 
     pub fn start(self) {
