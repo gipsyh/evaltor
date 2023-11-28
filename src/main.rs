@@ -123,7 +123,7 @@ impl Evaluation {
 
 #[allow(unused)]
 fn main() {
-    let suffix = "aig";
+    let suffix = "aag";
     let hwmcc15 = Benchmark::new("hwmcc15", "../MC-Benchmark/hwmcc15", suffix);
     let hwmcc17 = Benchmark::new("hwmcc17", "../MC-Benchmark/hwmcc17/single", suffix);
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);

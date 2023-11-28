@@ -9,11 +9,11 @@ impl Evaluatee for AbcPdr {
     }
 
     fn version(&self) -> String {
-        "r0".to_string()
+        "crgr2".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let path = format!("read {path}; pdr");
+        let path = format!("read {path}; pdr -n -c");
         let mut command = Command::new("../abc/build/abc");
         command.arg("-c").arg(path);
         command
