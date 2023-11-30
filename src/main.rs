@@ -124,12 +124,12 @@ impl Evaluation {
 #[allow(unused)]
 fn main() {
     let suffix = "aag";
-    let hwmcc15 = Benchmark::new("hwmcc15", "../MC-Benchmark/hwmcc15", suffix);
-    let hwmcc17 = Benchmark::new("hwmcc17", "../MC-Benchmark/hwmcc17/single", suffix);
-    let hwmcc1517 = Benchmark::new("hwmcc1517", "../MC-Benchmark/hwmcc1517", suffix);
-    let hwmcc_appr = Benchmark::new("hwmcc_appr", "../MC-Benchmark/hwmcc-appr", suffix);
+    let hwmcc15 = Benchmark::new("hwmcc15", "../mc-benchmark/hwmcc15", suffix);
+    let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", suffix);
+    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", suffix);
+    let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", suffix);
 
-    let mut evaluation = Evaluation::new(hwmcc1517);
+    let mut evaluation = Evaluation::new(hwmcc_appr);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
