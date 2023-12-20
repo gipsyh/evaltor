@@ -123,15 +123,16 @@ impl Evaluation {
 
 #[allow(unused)]
 fn main() {
-    let suffix = "aag";
+    let suffix = "btor2";
     let hwmcc15 = Benchmark::new("hwmcc15", "../mc-benchmark/hwmcc15", suffix);
     let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", suffix);
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", suffix);
+    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/btor2/bv", suffix);
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", suffix);
 
-    let mut evaluation = Evaluation::new(hwmcc_appr);
+    let mut evaluation = Evaluation::new(hwmcc20);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
-    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
+    evaluation.add_evaluatee(evaluatees::pono::Pono);
     evaluation.evaluate();
 }

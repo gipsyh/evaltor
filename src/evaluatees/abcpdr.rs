@@ -9,7 +9,7 @@ impl Evaluatee for AbcPdr {
     }
 
     fn version(&self) -> String {
-        "crgr2".to_string()
+        "r0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
