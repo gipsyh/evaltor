@@ -115,7 +115,7 @@ impl Evaluation {
                 joins.push(spawn(|| worker.start()));
             }
             for join in joins {
-                join.join().unwrap();
+                let _ = join.join();
             }
         }
     }
@@ -123,7 +123,7 @@ impl Evaluation {
 
 #[allow(unused)]
 fn main() {
-    let suffix = "aig";
+    let suffix = "aag";
     let hwmcc15 = Benchmark::new("hwmcc15", "../mc-benchmark/hwmcc15", suffix);
     let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", suffix);
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", suffix);
@@ -133,6 +133,6 @@ fn main() {
     let mut evaluation = Evaluation::new(hwmcc1517);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
-    evaluation.add_evaluatee(evaluatees::date18::CombinedPdr);
+    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.evaluate();
 }

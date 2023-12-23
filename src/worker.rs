@@ -95,8 +95,7 @@ impl Worker {
             .unwrap();
         let time = start.elapsed();
         let res = if let Some(status) = output {
-            let exit_code = status.code().unwrap();
-            if exit_code == 1 || exit_code == 0 {
+            if let Some(0 | 1) = status.code() {
                 EvaluationResult::Success(time)
             } else {
                 EvaluationResult::Failed
