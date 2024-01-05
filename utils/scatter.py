@@ -52,6 +52,7 @@ if __name__ == "__main__":
         Y.append(y)
 
     print((num_x, num_y))
+    plt.axis('equal')
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
     plt.yscale('log')
