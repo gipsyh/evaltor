@@ -134,6 +134,6 @@ fn main() {
     let mut evaluation = Evaluation::new(caishaowei);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
-    evaluation.add_evaluatee(evaluatees::minisat::Minisat);
+    evaluation.add_evaluatee(evaluatees::cadical::Cadical);
     evaluation.evaluate();
 }
