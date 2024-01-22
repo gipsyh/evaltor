@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import sys
 
 timeout = 1000
@@ -58,6 +57,10 @@ if __name__ == "__main__":
     plt.yscale('log')
     plt.xlabel(name[0])
     plt.ylabel(name[1])
+    plt.xlim(0.1, timeout + 500)
+    plt.ylim(0.1, timeout + 500)
     plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
     plt.show()
+    fig = plt.gcf()
+    fig.set_size_inches(5, 5)
     plt.savefig("scatter.png", dpi=500)
