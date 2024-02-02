@@ -103,7 +103,7 @@ impl Worker {
         } else {
             nix::sys::signal::kill(
                 nix::unistd::Pid::from_raw(child.id() as i32),
-                nix::sys::signal::Signal::SIGINT,
+                nix::sys::signal::Signal::SIGKILL,
             )
             .unwrap();
             EvaluationResult::Timeout
