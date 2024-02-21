@@ -129,10 +129,10 @@ fn main() {
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", suffix);
     let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/btor2/bv", suffix);
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", suffix);
-    let caishaowei = Benchmark::new("caishaowei", "../mc-benchmark/caishaowei-sat/", suffix);
+    let xepic = Benchmark::new("xepic", "../mc-benchmark/x-epic-2024/", "btor2");
 
-    let mut evaluation = Evaluation::new(hwmcc1517);
-    evaluation.set_timeout(Duration::from_secs(1000));
+    let mut evaluation = Evaluation::new(hwmcc_appr);
+    evaluation.set_timeout(Duration::from_secs(1500));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.evaluate();

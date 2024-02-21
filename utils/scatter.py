@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import sys
 
-timeout = 1000
+timeout = 1500
 
 
 def parse_time(time):
