@@ -9,7 +9,7 @@ impl Evaluatee for MyIc3 {
     }
 
     fn version(&self) -> String {
-        "t21".to_string()
+        "t26".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
