@@ -1,4 +1,5 @@
 pub mod abcpdr;
+pub mod avr;
 pub mod cadical;
 pub mod car;
 pub mod date18;

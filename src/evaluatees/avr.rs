@@ -1,20 +1,20 @@
 use crate::Evaluatee;
 use std::process::Command;
 
-pub struct MyIc3;
+pub struct IC3;
 
-impl Evaluatee for MyIc3 {
+impl Evaluatee for IC3 {
     fn name(&self) -> String {
-        "myic3".to_string()
+        "avr".to_string()
     }
 
     fn version(&self) -> String {
-        "t21".to_string()
+        "r0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("../ic3/target/release/ic3");
-        command.arg(path);
+        let mut command = Command::new("cd");
+        command.args(["../avr", "&&", "python3"]);
         command
     }
 }

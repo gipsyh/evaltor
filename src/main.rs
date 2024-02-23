@@ -1,3 +1,5 @@
+#![feature(thread_id_value)]
+
 mod evaluatees;
 mod worker;
 
@@ -127,12 +129,12 @@ fn main() {
     let hwmcc15 = Benchmark::new("hwmcc15", "../mc-benchmark/hwmcc15", suffix);
     let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", suffix);
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", suffix);
-    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/btor2/bv", suffix);
+    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig-1.8", "aag");
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", suffix);
     let xepic = Benchmark::new("xepic", "../mc-benchmark/x-epic-2024/", "btor2");
 
-    let mut evaluation = Evaluation::new(hwmcc_appr);
-    evaluation.set_timeout(Duration::from_secs(1500));
+    let mut evaluation = Evaluation::new(hwmcc1920);
+    evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
     evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
     evaluation.evaluate();
