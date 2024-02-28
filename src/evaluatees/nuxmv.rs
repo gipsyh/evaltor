@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::{fs::File, process::Command, thread};
+use std::{process::Command, thread};
 
 pub struct IC3;
 
