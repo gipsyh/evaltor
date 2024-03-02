@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import sys
+import math
+from scipy.stats import gmean
 
 timeout = 1500
 
@@ -36,21 +38,27 @@ if __name__ == "__main__":
     num_x = 0
     num_y = 0
     keys = sorted(data.keys())
+    speedup = []
     for key in keys:
         if len(data[key]) < 2:
             continue
+        bsdp = data[key][0] == "Timeout" or data[key][1] == "Timeout"
         x = parse_time(data[key][0])
         y = parse_time(data[key][1])
         if x <= 1 and y <= 1:
             continue
+        if not bsdp:
+            speedup.append(y / x)
         if x < y:
             num_x += 1
         elif x > y:
             num_y += 1
+        
         X.append(x)
         Y.append(y)
 
     print((num_x, num_y))
+    print(gmean(speedup))
     plt.axis('equal')
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
