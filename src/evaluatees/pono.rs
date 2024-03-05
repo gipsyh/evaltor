@@ -14,7 +14,7 @@ impl Evaluatee for Pono {
 
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../pono/build/pono");
-        command.args(["-e", "ic3sa", "-k", "1000000000"]);
+        command.args(["-e", "ic3sa", "-k", "100000"]);
         command.arg(path);
         command
     }

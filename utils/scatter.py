@@ -44,7 +44,10 @@ if __name__ == "__main__":
             continue
         bsdp = data[key][0] == "Timeout" or data[key][1] == "Timeout"
         x = parse_time(data[key][0])
-        y = parse_time(data[key][1])
+        y = parse_time(data[key][1])        
+        X.append(x)
+        Y.append(y)
+
         if x <= 1 and y <= 1:
             continue
         if not bsdp:
@@ -54,8 +57,6 @@ if __name__ == "__main__":
         elif x > y:
             num_y += 1
         
-        X.append(x)
-        Y.append(y)
 
     print((num_x, num_y))
     print(gmean(speedup))
