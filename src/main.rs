@@ -125,15 +125,14 @@ impl Evaluation {
 
 #[allow(unused)]
 fn main() {
-    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aag");
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aag");
-    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig-1.8", "aag");
-    let hwmcc1920mini = Benchmark::new("hwmcc1920mini", "../mc-benchmark/hwmcc1920mini", "aag");
-    let xepic = Benchmark::new("xepic", "../mc-benchmark/x-epic-2024/", "btor2");
+    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aag");
+    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/btor2", "btor2");
+    let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
 
-    let mut evaluation = Evaluation::new(hwmcc1920mini);
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 32);
-    evaluation.add_evaluatee(evaluatees::myic3::MyIc3);
+    let mut evaluation = Evaluation::new(hwmcc1920);
+    evaluation.set_timeout(Duration::from_secs(10));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
+    evaluation.add_evaluatee(evaluatees::avr::IC3);
     evaluation.evaluate();
 }

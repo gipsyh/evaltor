@@ -85,6 +85,7 @@ impl Worker {
 
     fn evaluate(&self, case: String, mut command: Command) {
         command.stdout(Stdio::piped());
+        command.stderr(Stdio::piped());
         let mut child = command.spawn().unwrap();
         let start = Instant::now();
         let output = child
@@ -101,15 +102,22 @@ impl Worker {
                 EvaluationResult::Failed
             }
         } else {
-            nix::sys::signal::kill(
-                nix::unistd::Pid::from_raw(child.id() as i32),
-                nix::sys::signal::Signal::SIGKILL,
-            )
-            .unwrap();
+            let cmd = format!(
+                r#"pstree -p {} | grep -oP '\(\K\d+' | sort -u | xargs -n 1 kill -9"#,
+                child.id()
+            );
+            Command::new("sh").args(["-c", &cmd]).output().unwrap();
             EvaluationResult::Timeout
         };
-        self.share
-            .submit_result(case, res, child.stdout.take().unwrap());
+        self.share.submit_result(
+            case,
+            res,
+            child
+                .stdout
+                .take()
+                .unwrap()
+                .chain(child.stderr.take().unwrap()),
+        );
     }
 
     pub fn start(self) {

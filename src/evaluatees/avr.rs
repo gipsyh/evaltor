@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::process::Command;
+use std::{process::Command, thread};
 
 pub struct IC3;
 
@@ -13,8 +13,9 @@ impl Evaluatee for IC3 {
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("cd");
-        command.args(["../avr", "&&", "python3"]);
+        let mut command = Command::new("python3");
+        let out = format!("/tmp/evaluator/{}", thread::current().id().as_u64());
+        command.args(["/root/avr/avr.py", "-o", &out, path]);
         command
     }
 }
