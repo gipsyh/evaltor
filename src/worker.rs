@@ -85,7 +85,6 @@ impl Worker {
 
     fn evaluate(&self, case: String, mut command: Command) {
         command.stdout(Stdio::piped());
-        command.stderr(Stdio::piped());
         let mut child = command.spawn().unwrap();
         let start = Instant::now();
         let output = child
@@ -109,15 +108,8 @@ impl Worker {
             Command::new("sh").args(["-c", &cmd]).output().unwrap();
             EvaluationResult::Timeout
         };
-        self.share.submit_result(
-            case,
-            res,
-            child
-                .stdout
-                .take()
-                .unwrap()
-                .chain(child.stderr.take().unwrap()),
-        );
+        self.share
+            .submit_result(case, res, child.stdout.take().unwrap());
     }
 
     pub fn start(self) {

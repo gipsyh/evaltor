@@ -6,6 +6,6 @@ pub mod date18;
 pub mod gipsat;
 pub mod ic3ref;
 pub mod minisat;
-pub mod myic3;
 pub mod nuxmv;
 pub mod pono;
+pub mod ric3;

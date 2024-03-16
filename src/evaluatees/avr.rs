@@ -15,7 +15,7 @@ impl Evaluatee for IC3 {
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("python3");
         let out = format!("/tmp/evaluator/{}", thread::current().id().as_u64());
-        command.args(["/root/avr/avr.py", "-o", &out, path]);
+        command.args(["/root/avr/avr.py", "--memout", "16010", "-o", &out, path]);
         command
     }
 }

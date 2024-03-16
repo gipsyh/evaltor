@@ -8,7 +8,12 @@ if __name__ == "__main__":
             for line in f:
                 case, time = line.strip().split()
                 if case.endswith("aag"):
-                    case = case[:-3] + "aig"
+                    case = case[:-4]
+                if case.endswith("aig"):
+                    case = case[:-4]
+                if case.endswith("btor2"):
+                    case = case[:-6]
+                case = case.split('/')[-1]
                 if case in data:
                     data[case].append(time)
                 else:
