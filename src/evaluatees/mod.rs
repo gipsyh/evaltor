@@ -5,6 +5,7 @@ pub mod car;
 pub mod date18;
 pub mod gipsat;
 pub mod ic3ref;
+pub mod iimc;
 pub mod minisat;
 pub mod nuxmv;
 pub mod pono;

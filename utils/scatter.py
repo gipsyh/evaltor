@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import sys
-import math
 from scipy.stats import gmean
 
-timeout = 1500
+timeout = 1000
 
 
 def parse_time(time):
@@ -59,7 +58,8 @@ if __name__ == "__main__":
         
 
     print((num_x, num_y))
-    print(gmean(speedup))
+    gmean = gmean(speedup)
+    print(gmean)
     plt.axis('equal')
     plt.scatter(X, Y, marker='x')
     plt.xscale('log')
@@ -69,6 +69,7 @@ if __name__ == "__main__":
     plt.xlim(0.1, timeout + 500)
     plt.ylim(0.1, timeout + 500)
     plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
+    plt.plot([0, timeout], [0, timeout * gmean], linestyle='dashed', color="#721454")
     plt.show()
     fig = plt.gcf()
     fig.set_size_inches(5, 5)
