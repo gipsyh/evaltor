@@ -2,7 +2,6 @@ pub mod abcpdr;
 pub mod avr;
 pub mod cadical;
 pub mod car;
-pub mod date18;
 pub mod gipsat;
 pub mod ic3ref;
 pub mod iimc;
