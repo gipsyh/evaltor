@@ -2,6 +2,7 @@ pub mod abcpdr;
 pub mod avr;
 pub mod cadical;
 pub mod car;
+pub mod cryptominisat;
 pub mod gipsat;
 pub mod ic3ref;
 pub mod iimc;

@@ -4,7 +4,6 @@ from scipy.stats import gmean
 
 timeout = 1000
 
-
 def parse_time(time):
     if time == "Timeout":
         return timeout

@@ -9,13 +9,15 @@ impl Evaluatee for Ic3Ref {
     }
 
     fn version(&self) -> String {
-        "r0".to_string()
+        "gipsat".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../IC3ref/build/ic3refmain");
-        let file = File::open(path).unwrap();
-        command.stdin(file);
+        // let file = File::open(path).unwrap();
+        // command.stdin(file);
+        command.arg("-b");
+        command.arg(path);
         command
     }
 }

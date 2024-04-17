@@ -9,7 +9,7 @@ impl Evaluatee for RIC3 {
     }
 
     fn version(&self) -> String {
-        "minisat".to_string()
+        "t0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {

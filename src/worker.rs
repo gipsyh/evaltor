@@ -101,11 +101,16 @@ impl Worker {
                 EvaluationResult::Failed
             }
         } else {
-            let cmd = format!(
-                r#"pstree -p {} | grep -oP '\(\K\d+' | sort -u | xargs -n 1 kill -9"#,
-                child.id()
-            );
-            Command::new("sh").args(["-c", &cmd]).output().unwrap();
+            // let cmd = format!(
+            //     r#"pstree -p {} | grep -oP '\(\K\d+' | sort -u | xargs -n 1 kill"#,
+            //     child.id()
+            // );
+            // Command::new("sh").args(["-c", &cmd]).output().unwrap();
+            nix::sys::signal::kill(
+                nix::unistd::Pid::from_raw(child.id() as i32),
+                nix::sys::signal::Signal::SIGINT,
+            )
+            .unwrap();
             EvaluationResult::Timeout
         };
         self.share
