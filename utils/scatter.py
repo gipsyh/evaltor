@@ -24,6 +24,7 @@ if __name__ == "__main__":
         with open(file, 'r') as f:
             for line in f:
                 case, time = line.strip().split()
+                case = case.rsplit('/', 1)[-1]
                 if case.endswith("aag"):
                     case = case[:-3] + "aig"
                 if case in data:
