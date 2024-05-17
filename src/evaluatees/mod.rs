@@ -1,4 +1,4 @@
-pub mod abcpdr;
+pub mod abc;
 pub mod avr;
 pub mod cadical;
 pub mod car;

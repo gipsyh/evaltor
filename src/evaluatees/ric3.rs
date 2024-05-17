@@ -9,7 +9,7 @@ impl Evaluatee for RIC3 {
     }
 
     fn version(&self) -> String {
-        "t0".to_string()
+        "t1".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
