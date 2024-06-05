@@ -47,7 +47,7 @@ if __name__ == "__main__":
         X.append(x)
         Y.append(y)
 
-        if x <= 1 and y <= 1:
+        if x <= 1 or y <= 1:
             continue
         if not bsdp:
             speedup.append(y / x)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     plt.xlim(0.1, timeout + 500)
     plt.ylim(0.1, timeout + 500)
     plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
-    plt.plot([0, timeout], [0, timeout * gmean], linestyle='dashed', color="#721454")
+    # plt.plot([0, timeout], [0, timeout * gmean], linestyle='dashed', color="#721454")
     plt.show()
     fig = plt.gcf()
     fig.set_size_inches(5, 5)
