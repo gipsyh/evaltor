@@ -125,11 +125,12 @@ impl Evaluation {
 
 #[allow(unused)]
 fn main() {
-    let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aag");
-    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aag");
-    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/fraig", "aag");
-    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aag");
-    let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aag");
+    let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
+    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
+    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
+    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aig");
+    let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
+    let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
     let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
 

@@ -58,6 +58,25 @@ impl Evaluatee for IMC {
     }
 }
 
+pub struct KIND;
+
+impl Evaluatee for KIND {
+    fn name(&self) -> String {
+        "abckind".to_string()
+    }
+
+    fn version(&self) -> String {
+        "r0".to_string()
+    }
+
+    fn evaluate(&self, path: &str) -> Command {
+        let path = format!("read {path}; logic; undc; strash; zero; ind");
+        let mut command = Command::new("/usr/local/bin/abc");
+        command.arg("-c").arg(path);
+        command
+    }
+}
+
 pub struct Fraig;
 
 impl Evaluatee for Fraig {

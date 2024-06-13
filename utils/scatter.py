@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import sys
 from scipy.stats import gmean
 
-timeout = 1000
+timeout = 3600
+
 
 def parse_time(time):
     if time == "Timeout":
@@ -13,7 +14,7 @@ def parse_time(time):
         time = float(time)
         if time < 0.01:
             time = 0.01
-        return time
+        return min(time, timeout)
 
 
 if __name__ == "__main__":
@@ -21,12 +22,12 @@ if __name__ == "__main__":
     name = []
     for file in sys.argv[1:3]:
         name.append(file)
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             for line in f:
                 case, time = line.strip().split()
-                case = case.rsplit('/', 1)[-1]
-                if case.endswith("aag"):
-                    case = case[:-3] + "aig"
+                case = case.rsplit("/", 1)[-1]
+                if case.endswith(".aag") or case.endswith(".aig"):
+                    case = case[:-4]
                 if case in data:
                     data[case].append(time)
                 else:
@@ -43,7 +44,7 @@ if __name__ == "__main__":
             continue
         bsdp = data[key][0] == "Timeout" or data[key][1] == "Timeout"
         x = parse_time(data[key][0])
-        y = parse_time(data[key][1])        
+        y = parse_time(data[key][1])
         X.append(x)
         Y.append(y)
 
@@ -55,22 +56,33 @@ if __name__ == "__main__":
             num_x += 1
         elif x > y:
             num_y += 1
-        
 
     print((num_x, num_y))
     gmean = gmean(speedup)
     print(gmean)
-    plt.axis('equal')
-    plt.scatter(X, Y, marker='x')
-    plt.xscale('log')
-    plt.yscale('log')
+    plt.axis("equal")
+    plt.scatter(X, Y, marker="x")
+    plt.xscale("log")
+    plt.yscale("log")
     plt.xlabel(name[0])
     plt.ylabel(name[1])
     plt.xlim(0.1, timeout + 500)
     plt.ylim(0.1, timeout + 500)
-    plt.plot([0, timeout], [0, timeout], linestyle='dashed', color='grey')
+    plt.plot([0, timeout], [0, timeout], linestyle="dashed", color="grey")
     # plt.plot([0, timeout], [0, timeout * gmean], linestyle='dashed', color="#721454")
     plt.show()
     fig = plt.gcf()
     fig.set_size_inches(5, 5)
     plt.savefig("scatter.png", dpi=500)
+
+    num_x_solved = 0
+    for x in X:
+        if x < timeout:
+            num_x_solved += 1
+    
+    num_y_solved = 0
+    for y in Y:
+        if y < timeout:
+            num_y_solved += 1
+    
+    print(num_x_solved, num_y_solved)
