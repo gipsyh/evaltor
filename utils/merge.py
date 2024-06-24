@@ -21,6 +21,7 @@ if __name__ == "__main__":
     with open("merge-result", 'w') as result:
         keys = sorted(data.keys())
         for key in keys:
-            output = f"{key} "
-            output += " ".join(str(element) for element in data[key])
-            result.write(output + '\n')
+            if len(data[key]) == len(sys.argv[1:]):
+                output = f"{key} "
+                output += " ".join(str(element) for element in data[key])
+                result.write(output + '\n')

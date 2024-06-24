@@ -128,15 +128,16 @@ fn main() {
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
     let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
+    let hwmcc1920uns = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920uns", "aig");
     let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aig");
     let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
     let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
     let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
 
-    let mut evaluation = Evaluation::new(hwmcc1920);
+    let mut evaluation = Evaluation::new(hwmcc1920uns);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
-    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
+    evaluation.add_evaluatee(evaluatees::ric3::BMC);
     evaluation.evaluate();
 }

@@ -89,7 +89,7 @@ impl Evaluatee for Fraig {
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let name  = &path[path.rfind('/').unwrap()..];
+        let name = &path[path.rfind('/').unwrap()..];
         let path = format!("read {path}; fraig; write ./fraig/{name}");
         let mut command = Command::new("/usr/local/bin/abc");
         command.arg("-c").arg(path);
