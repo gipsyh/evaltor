@@ -59,6 +59,10 @@ pub trait Evaluatee: Send + Sync {
     fn version(&self) -> String;
 
     fn evaluate(&self, path: &str) -> Command;
+
+    fn parallelism(&self) -> usize {
+        1
+    }
 }
 
 pub struct Evaluation {
@@ -98,6 +102,7 @@ impl Evaluation {
 
     pub fn evaluate(&mut self) {
         for evaluatee in self.evaluatees.iter() {
+            let test_cores = self.test_cores / evaluatee.parallelism();
             let file = format!(
                 "result/{}-{}-{}-{}",
                 evaluatee.name(),
@@ -112,7 +117,7 @@ impl Evaluation {
                 self.memory_limit,
             ));
             let mut joins = Vec::new();
-            for _ in 0..self.test_cores {
+            for _ in 0..test_cores {
                 let worker = Worker::new(evaluatee.clone(), share.clone());
                 joins.push(spawn(|| worker.start()));
             }
@@ -135,9 +140,9 @@ fn main() {
     let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
 
-    let mut evaluation = Evaluation::new(hwmcc1920uns);
+    let mut evaluation = Evaluation::new(hwmcc1920);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
-    evaluation.add_evaluatee(evaluatees::ric3::BMC);
+    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
     evaluation.evaluate();
 }
