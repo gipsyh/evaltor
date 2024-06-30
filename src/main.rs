@@ -143,6 +143,6 @@ fn main() {
     let mut evaluation = Evaluation::new(hwmcc1920);
     evaluation.set_timeout(Duration::from_secs(1000));
     evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
-    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
+    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
     evaluation.evaluate();
 }
