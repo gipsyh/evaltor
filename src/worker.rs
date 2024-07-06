@@ -53,7 +53,13 @@ impl Share {
         self.race.lock().unwrap().cases.pop()
     }
 
-    fn submit_result<R: Read>(&self, case: String, res: EvaluationResult, mut log: R) {
+    fn submit_result<R: Read, E: Read>(
+        &self,
+        case: String,
+        res: EvaluationResult,
+        mut log: R,
+        mut stderr: E,
+    ) {
         let mut race = self.race.lock().unwrap();
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
@@ -64,6 +70,7 @@ impl Share {
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
         let _ = io::copy(&mut log, &mut race.log_file);
+        let _ = io::copy(&mut stderr, &mut race.log_file);
     }
 }
 
@@ -85,7 +92,7 @@ impl Worker {
 
     fn evaluate(&self, case: String, mut command: Command) {
         command.stdout(Stdio::piped());
-        let mut child = command.spawn().unwrap();
+        let mut child = command.stderr(Stdio::piped()).spawn().unwrap();
         let start = Instant::now();
         let output = child
             .controlled()
@@ -113,8 +120,12 @@ impl Worker {
             .unwrap();
             EvaluationResult::Timeout
         };
-        self.share
-            .submit_result(case, res, child.stdout.take().unwrap());
+        self.share.submit_result(
+            case,
+            res,
+            child.stdout.take().unwrap(),
+            child.stderr.take().unwrap(),
+        );
     }
 
     pub fn start(self) {

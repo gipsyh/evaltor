@@ -138,6 +138,7 @@ fn main() {
     let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
     let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
     let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
+    let others = Benchmark::new("others", "/root/mc-benchmark/others", "btor2");
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
 
     let mut evaluation = Evaluation::new(hwmcc1920);
