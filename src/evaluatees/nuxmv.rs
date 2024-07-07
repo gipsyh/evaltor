@@ -8,10 +8,6 @@ impl Evaluatee for IC3 {
         "nuXmv".to_string()
     }
 
-    fn version(&self) -> String {
-        "r0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let stdin = format!(
             "read_aiger_model -i {path}

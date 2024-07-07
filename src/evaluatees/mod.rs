@@ -1,6 +1,7 @@
 pub mod abc;
 pub mod avr;
 pub mod cadical;
+pub mod camical;
 pub mod car;
 pub mod cryptominisat;
 pub mod gipsat;

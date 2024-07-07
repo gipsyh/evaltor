@@ -8,10 +8,6 @@ impl Evaluatee for Pdr {
         "abcpdr".to_string()
     }
 
-    fn version(&self) -> String {
-        "r0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let path = format!("read {path}; logic; undc; strash; zero; pdr");
         let mut command = Command::new("../abc/build/abc");
@@ -25,10 +21,6 @@ pub struct BMC;
 impl Evaluatee for BMC {
     fn name(&self) -> String {
         "abcbmc".to_string()
-    }
-
-    fn version(&self) -> String {
-        "r0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
@@ -46,10 +38,6 @@ impl Evaluatee for IMC {
         "abcimc".to_string()
     }
 
-    fn version(&self) -> String {
-        "r0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let path = format!("read {path}; logic; undc; strash; zero; int");
         let mut command = Command::new("/usr/local/bin/abc");
@@ -65,10 +53,6 @@ impl Evaluatee for KIND {
         "abckind".to_string()
     }
 
-    fn version(&self) -> String {
-        "r0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let path = format!("read {path}; logic; undc; strash; zero; ind");
         let mut command = Command::new("/usr/local/bin/abc");
@@ -82,10 +66,6 @@ pub struct Fraig;
 impl Evaluatee for Fraig {
     fn name(&self) -> String {
         "abcfraig".to_string()
-    }
-
-    fn version(&self) -> String {
-        "r0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {

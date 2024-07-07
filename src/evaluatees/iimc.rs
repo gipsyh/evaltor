@@ -8,10 +8,6 @@ impl Evaluatee for IC3 {
         "iimc".to_string()
     }
 
-    fn version(&self) -> String {
-        "default".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../iimc/iimc");
         command.args(["-t", "ic3"]);

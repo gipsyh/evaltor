@@ -1,15 +1,16 @@
 use crate::Evaluatee;
 use std::process::Command;
 
-pub struct Minisat;
+pub struct Camical;
 
-impl Evaluatee for Minisat {
+impl Evaluatee for Camical {
     fn name(&self) -> String {
-        "minisat".to_string()
+        "camical".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("../minisat/build/minisat");
+        let mut command = Command::new("../camical/src/build/camical/camical");
+        command.arg("-n");
         command.arg(path);
         command
     }

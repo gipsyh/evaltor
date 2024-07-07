@@ -8,10 +8,6 @@ impl Evaluatee for Cryptominisat {
         "cryptominisat".to_string()
     }
 
-    fn version(&self) -> String {
-        "r0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../cryptominisat-rs/cryptominisat/build/cryptominisat5");
         command.arg("--verb=0");

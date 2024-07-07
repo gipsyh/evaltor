@@ -26,10 +26,6 @@ impl Evaluatee for BMC {
         "rIC3bmc".to_string()
     }
 
-    fn version(&self) -> String {
-        "t0".to_string()
-    }
-
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg("--bmc");
@@ -43,10 +39,6 @@ pub struct Portfolio;
 impl Evaluatee for Portfolio {
     fn name(&self) -> String {
         "rIC3portfolio".to_string()
-    }
-
-    fn version(&self) -> String {
-        "t0".to_string()
     }
 
     fn evaluate(&self, path: &str) -> Command {

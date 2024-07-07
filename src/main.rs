@@ -56,7 +56,9 @@ pub enum EvaluationResult {
 pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
-    fn version(&self) -> String;
+    fn version(&self) -> String {
+        "r0".to_string()
+    }
 
     fn evaluate(&self, path: &str) -> Command;
 
@@ -133,7 +135,7 @@ fn main() {
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
     let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
-    let hwmcc1920uns = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920uns", "aig");
+    let hwmcc1920sat = Benchmark::new("hwmcc1920sat", "../mc-benchmark/hwmcc1920sat", "aig");
     let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aig");
     let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
     let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
