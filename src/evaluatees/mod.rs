@@ -1,5 +1,6 @@
 pub mod abc;
 pub mod avr;
+pub mod avy;
 pub mod cadical;
 pub mod camical;
 pub mod car;
