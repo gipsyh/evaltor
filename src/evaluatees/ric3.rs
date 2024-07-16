@@ -34,6 +34,22 @@ impl Evaluatee for BMC {
     }
 }
 
+pub struct Kind;
+
+impl Evaluatee for Kind {
+    fn name(&self) -> String {
+        "rIC3kind".to_string()
+    }
+
+    fn evaluate(&self, path: &str) -> Command {
+        let mut command = Command::new("../rIC3/target/release/rIC3");
+        command.arg("--kind");
+        command.arg("-v");
+        command.arg(path);
+        command
+    }
+}
+
 pub struct Portfolio;
 
 impl Evaluatee for Portfolio {
