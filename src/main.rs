@@ -134,7 +134,7 @@ impl Evaluation {
 fn main() {
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
-    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig-1.8", "aig");
+    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
     let hwmcc1920sat = Benchmark::new("hwmcc1920sat", "../mc-benchmark/hwmcc1920sat", "aig");
     let hwmcc1920uns = Benchmark::new("hwmcc1920uns", "../mc-benchmark/hwmcc1920uns", "aig");
     let hwmcc1920cal = Benchmark::new("hwmcc1920cal", "../mc-benchmark/hwmcc1920cal", "aig");

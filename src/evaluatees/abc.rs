@@ -60,19 +60,3 @@ impl Evaluatee for KIND {
         command
     }
 }
-
-pub struct Fraig;
-
-impl Evaluatee for Fraig {
-    fn name(&self) -> String {
-        "abcfraig".to_string()
-    }
-
-    fn evaluate(&self, path: &str) -> Command {
-        let name = &path[path.rfind('/').unwrap()..];
-        let path = format!("read {path}; fraig; write ./fraig/{name}");
-        let mut command = Command::new("/usr/local/bin/abc");
-        command.arg("-c").arg(path);
-        command
-    }
-}
