@@ -147,9 +147,9 @@ fn main() {
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
     let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
 
-    let mut evaluation = Evaluation::new(hwmcc20);
-    evaluation.set_timeout(Duration::from_secs(3600));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
-    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
+    let mut evaluation = Evaluation::new(hwmcc1920);
+    evaluation.set_timeout(Duration::from_secs(1000));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
+    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
     evaluation.evaluate();
 }

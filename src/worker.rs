@@ -91,8 +91,11 @@ impl Worker {
     }
 
     fn evaluate(&self, case: String, mut command: Command) {
-        command.stdout(Stdio::piped());
-        let mut child = command.stderr(Stdio::piped()).spawn().unwrap();
+        let mut child = command
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
         let start = Instant::now();
         let output = child
             .controlled()

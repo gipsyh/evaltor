@@ -60,3 +60,22 @@ impl Evaluatee for KIND {
         command
     }
 }
+
+pub struct SuperProve;
+
+impl Evaluatee for SuperProve {
+    fn name(&self) -> String {
+        "abcsp".to_string()
+    }
+
+    fn evaluate(&self, path: &str) -> Command {
+        let mut command =
+            Command::new("/root/super-prove-build/build/super_prove/bin/super_prove.sh");
+        command.arg(path);
+        command
+    }
+
+    fn parallelism(&self) -> usize {
+        16
+    }
+}
