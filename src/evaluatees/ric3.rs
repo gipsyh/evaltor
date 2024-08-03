@@ -15,6 +15,7 @@ impl Evaluatee for RIC3 {
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg(path);
+        command.arg("--ic3");
         command
     }
 }
@@ -65,6 +66,6 @@ impl Evaluatee for Portfolio {
     }
 
     fn parallelism(&self) -> usize {
-        6
+        8
     }
 }

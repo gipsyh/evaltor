@@ -4,6 +4,7 @@ mod evaluatees;
 mod worker;
 
 use chrono::Local;
+use regex::Regex;
 use std::{fs::read_dir, process::Command, sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
 
@@ -73,6 +74,7 @@ pub struct Evaluation {
     timeout: Duration,
     memory_limit: usize,
     test_cores: usize,
+    exclude: Vec<Regex>,
 }
 
 impl Evaluation {
@@ -83,7 +85,12 @@ impl Evaluation {
             timeout: Duration::from_secs(1000),
             test_cores: num_cpus::get(),
             memory_limit: 1024 * 1024 * 1024,
+            exclude: Vec::new(),
         }
+    }
+
+    pub fn exclude(&mut self, e: &str) {
+        self.exclude.push(Regex::new(e).unwrap())
     }
 
     pub fn set_timeout(&mut self, timeout: Duration) {
@@ -112,12 +119,9 @@ impl Evaluation {
                 Local::now().format("%m%d%H%M"),
                 evaluatee.version(),
             );
-            let share = Arc::new(Share::new(
-                self.benchmark.caces(),
-                file,
-                self.timeout,
-                self.memory_limit,
-            ));
+            let mut cases = self.benchmark.caces();
+            cases.retain(|f| self.exclude.iter().all(|r| !r.is_match(f)));
+            let share = Arc::new(Share::new(cases, file, self.timeout, self.memory_limit));
             let mut joins = Vec::new();
             for _ in 0..test_cores {
                 let worker = Worker::new(evaluatee.clone(), share.clone());
@@ -143,13 +147,15 @@ fn main() {
     let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
     let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
     let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "btor2");
-    let others = Benchmark::new("others", "/root/mc-benchmark/others/fastfir", "aig");
+    let others = Benchmark::new("others", "/root/mc-benchmark/others/atxfifo/aig", "aig");
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
     let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
 
-    let mut evaluation = Evaluation::new(hwmcc1920);
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
-    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
+    let mut evaluation = Evaluation::new(hwmcc20);
+    evaluation.exclude(r"mul[123]\.aig$");
+    evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
+    evaluation.set_timeout(Duration::from_secs(3600));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
+    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
     evaluation.evaluate();
 }
