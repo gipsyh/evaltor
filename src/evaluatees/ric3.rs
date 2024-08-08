@@ -66,6 +66,6 @@ impl Evaluatee for Portfolio {
     }
 
     fn parallelism(&self) -> usize {
-        8
+        12
     }
 }
