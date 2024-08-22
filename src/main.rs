@@ -137,6 +137,7 @@ impl Evaluation {
 #[allow(unused)]
 fn main() {
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
+    let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", "aig");
     let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
     let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
     let hwmcc1920sat = Benchmark::new("hwmcc1920sat", "../mc-benchmark/hwmcc1920sat", "aig");
@@ -152,11 +153,11 @@ fn main() {
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
     let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
 
-    let mut evaluation = Evaluation::new(hwmcc20);
-    evaluation.exclude(r"mul[123]\.aig$");
-    evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
-    evaluation.set_timeout(Duration::from_secs(3600));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
-    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
+    let mut evaluation = Evaluation::new(hwmcc1517);
+    // evaluation.exclude(r"mul[123]\.aig$");
+    // evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
+    evaluation.set_timeout(Duration::from_secs(1000));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
+    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
     evaluation.evaluate();
 }

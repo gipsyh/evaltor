@@ -29,7 +29,7 @@ impl Evaluatee for BMC {
 
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.args(&["--bmc", "--kissat", "--step", "70"]);
+        command.args(&["--bmc", "--bmc-kissat", "--step", "70"]);
         command.arg(path);
         command
     }
