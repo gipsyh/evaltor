@@ -16,6 +16,7 @@ impl Evaluatee for RIC3 {
         let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg(path);
         command.arg("--ic3");
+        // command.arg("--ic3-inn");
         command
     }
 }
@@ -45,7 +46,6 @@ impl Evaluatee for Kind {
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg("--kind");
-        command.arg("-v");
         command.arg(path);
         command
     }
