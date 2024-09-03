@@ -15,7 +15,9 @@ impl Evaluatee for RIC3 {
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg(path);
-        command.arg("--ic3");
+        command.arg("-e");
+        command.arg("ic3");
+        command.arg("--ic3-ctg");
         // command.arg("--ic3-inn");
         command
     }
@@ -30,7 +32,7 @@ impl Evaluatee for BMC {
 
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.args(&["--bmc", "--bmc-kissat", "--step", "70"]);
+        command.args(&["-e", "bmc", "--certify"]);
         command.arg(path);
         command
     }
@@ -59,13 +61,15 @@ impl Evaluatee for Portfolio {
     }
 
     fn evaluate(&self, path: &str) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.arg("--portfolio");
+        let mut command = Command::new("../rIC3-HWMCC24/rIC3");
+        command.arg("-e");
+        command.arg("portfolio");
+        command.arg("--certify");
         command.arg(path);
         command
     }
 
     fn parallelism(&self) -> usize {
-        12
+        16
     }
 }

@@ -145,19 +145,23 @@ fn main() {
     let hwmcc1920cal = Benchmark::new("hwmcc1920cal", "../mc-benchmark/hwmcc1920cal", "aig");
     let hwmcc1920ns = Benchmark::new("hwmcc1920ns", "../mc-benchmark/hwmcc1920ns", "aig");
     let hwmcc20ns = Benchmark::new("hwmcc20ns", "../mc-benchmark/hwmcc20ns", "aig");
-    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aig");
+    let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/btor2/bv", "btor2");
     let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
     let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
-    let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/aig", "aig");
-    let others = Benchmark::new("others", "/root/mc-benchmark/others/vgasim-imgfifo/aig", "aig");
+    let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "aig");
+    let others = Benchmark::new(
+        "others",
+        "/root/mc-benchmark/others/vgasim-imgfifo/aig",
+        "aig",
+    );
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
     let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
 
-    let mut evaluation = Evaluation::new(hwmcc1517);
+    let mut evaluation = Evaluation::new(hwmcc20);
     // evaluation.exclude(r"mul[123]\.aig$");
     // evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
-    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
+    evaluation.set_timeout(Duration::from_secs(20));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
+    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
     evaluation.evaluate();
 }
