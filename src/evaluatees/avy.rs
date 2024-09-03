@@ -14,3 +14,22 @@ impl Evaluatee for Avy {
         command
     }
 }
+
+pub struct Pavy;
+
+impl Evaluatee for Pavy {
+    fn name(&self) -> String {
+        "pavy".to_string()
+    }
+
+    fn evaluate(&self, path: &str) -> Command {
+        let mut command = Command::new("python3");
+        command.arg("/root/pavy/scripts/pavy.py");
+        command.arg(path);
+        command
+    }
+
+    fn parallelism(&self) -> usize {
+        10
+    }
+}
