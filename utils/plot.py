@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import sys
 
-TIMEOUT = 1000
+TIMEOUT = 3600
 
 if __name__ == "__main__":
     for file_name in sys.argv[1:]:
@@ -19,7 +19,9 @@ if __name__ == "__main__":
                 else:
                     par2 += TIMEOUT * 2
         data = sorted(data)
-        print(file_name, len(data), '{:.2f}'.format(par2 / cases))
+        print(
+            file_name, "{}/{}".format(len(data), cases), "{:.2f}".format(par2 / cases)
+        )
         plt.plot(range(len(data)), data, marker="x", label=file_name)
 
     plt.title("result")

@@ -8,8 +8,12 @@ impl Evaluatee for Pdr {
         "abcpdr".to_string()
     }
 
+    fn version(&self) -> String {
+        "standard".to_string()
+    }
+
     fn evaluate(&self, path: &str) -> Command {
-        let path = format!("read {path}; logic; undc; strash; zero; pdr");
+        let path = format!("read {path}; logic; undc; strash; zero; pdr -n");
         let mut command = Command::new("../abc/build/abc");
         command.arg("-c").arg(path);
         command

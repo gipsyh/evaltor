@@ -9,6 +9,32 @@ impl Evaluatee for RIC3 {
     }
 
     fn version(&self) -> String {
+        "dynamic".to_string()
+    }
+
+    fn evaluate(&self, path: &str) -> Command {
+        let mut command = Command::new("../rIC3/target/release/rIC3");
+        command.arg(path);
+        command.arg("-e");
+        command.arg("ic3");
+        // command.arg("--ic3-no-dynamic");
+        // command.arg("--ic3-ctg");
+        // command.arg("--ic3-ctg-limit");
+        // command.arg("5");
+        // command.arg("--certify");
+        // command.arg("--ic3-inn");
+        command
+    }
+}
+
+pub struct PRIC3;
+
+impl Evaluatee for PRIC3 {
+    fn name(&self) -> String {
+        "PrIC3".to_string()
+    }
+
+    fn version(&self) -> String {
         "t1".to_string()
     }
 
@@ -17,9 +43,13 @@ impl Evaluatee for RIC3 {
         command.arg(path);
         command.arg("-e");
         command.arg("ic3");
-        command.arg("--ic3-ctg");
-        // command.arg("--ic3-inn");
+        command.arg("--ic3-parallelism");
+        command.arg("8");
         command
+    }
+
+    fn parallelism(&self) -> usize {
+        8
     }
 }
 

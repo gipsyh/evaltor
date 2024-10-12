@@ -43,6 +43,9 @@ impl Benchmark {
     }
 
     pub fn caces(&self) -> Vec<String> {
+        // let mut cases = self.inner_cases(&self.path);
+        // cases.shuffle(&mut thread_rng());
+        // cases
         self.inner_cases(&self.path)
     }
 }
@@ -156,12 +159,14 @@ fn main() {
     );
     let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
     let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
+    let hgy = Benchmark::new("hgy", "../mc-benchmark/hgy", "aig");
+    let tmp = Benchmark::new("tmp", "../mc-benchmark/tmp", "aig");
 
-    let mut evaluation = Evaluation::new(ic3inn);
+    let mut evaluation = Evaluation::new(hwmcc1920);
     // evaluation.exclude(r"mul[123]\.aig$");
     // evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
-    evaluation.set_timeout(Duration::from_secs(1000));
-    evaluation.set_memory_limit(1024 * 1024 * 1024 * 64);
-    evaluation.add_evaluatee(evaluatees::ric3::Portfolio);
+    evaluation.set_timeout(Duration::from_secs(3600));
+    evaluation.set_memory_limit(1024 * 1024 * 1024 * 16);
+    evaluation.add_evaluatee(evaluatees::ric3::RIC3);
     evaluation.evaluate();
 }
