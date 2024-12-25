@@ -141,28 +141,9 @@ impl Evaluation {
 fn main() {
     let hwmcc_appr = Benchmark::new("hwmcc_appr", "../mc-benchmark/hwmcc-appr", "aig");
     let hwmcc17 = Benchmark::new("hwmcc17", "../mc-benchmark/hwmcc17/single", "aig");
-    let hwmcc1517 = Benchmark::new("hwmcc1517", "../mc-benchmark/hwmcc1517", "aig");
-    let hwmcc1920 = Benchmark::new("hwmcc1920", "../mc-benchmark/hwmcc1920/aig", "aig");
-    let hwmcc1920sat = Benchmark::new("hwmcc1920sat", "../mc-benchmark/hwmcc1920sat", "aig");
-    let hwmcc1920uns = Benchmark::new("hwmcc1920uns", "../mc-benchmark/hwmcc1920uns", "aig");
-    let hwmcc1920cal = Benchmark::new("hwmcc1920cal", "../mc-benchmark/hwmcc1920cal", "aig");
-    let hwmcc1920ns = Benchmark::new("hwmcc1920ns", "../mc-benchmark/hwmcc1920ns", "aig");
-    let hwmcc20ns = Benchmark::new("hwmcc20ns", "../mc-benchmark/hwmcc20ns", "aig");
     let hwmcc20 = Benchmark::new("hwmcc20", "../mc-benchmark/hwmcc20/aig", "aig");
-    let avr = Benchmark::new("avr", "../mc-benchmark/avr", "aig");
-    let cal = Benchmark::new("cal", "../mc-benchmark/avr/industry", "aig");
-    let xepic = Benchmark::new("xepic", "/root/mc-benchmark/x-epic-2024/btor2", "aig");
-    let others = Benchmark::new(
-        "others",
-        "/root/mc-benchmark/others/vgasim-imgfifo/aig",
-        "aig",
-    );
-    let sat23 = Benchmark::new("sat23", "/root/sat23", "cnf");
-    let ic3inn = Benchmark::new("ic3inn", "/root/innard-benchmarks", "aig");
-    let hgy = Benchmark::new("hgy", "../mc-benchmark/hgy", "aig");
-    let tmp = Benchmark::new("tmp", "../mc-benchmark/tmp", "aig");
 
-    let mut evaluation = Evaluation::new(hwmcc1920);
+    let mut evaluation = Evaluation::new(hwmcc20);
     // evaluation.exclude(r"mul[123]\.aig$");
     // evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
     evaluation.set_timeout(Duration::from_secs(3600));
