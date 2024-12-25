@@ -62,7 +62,7 @@ impl Evaluatee for BMC {
 
     fn evaluate(&self, path: &str) -> Command {
         let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.args(&["-e", "bmc", "--certify"]);
+        command.args(&["-e", "bmc"]);
         command.arg(path);
         command
     }
