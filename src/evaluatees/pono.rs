@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
 
 pub struct Pono;
 
@@ -12,7 +12,7 @@ impl Evaluatee for Pono {
         "ic3sa".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("../pono/build/pono");
         command.args(["-e", "ic3sa", "-k", "100000"]);
         command.arg(path);

@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
 
 pub struct Avy;
 
@@ -8,7 +8,7 @@ impl Evaluatee for Avy {
         "avy".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("../extavy/build/avy/src/avy");
         command.arg(path);
         command
@@ -22,7 +22,7 @@ impl Evaluatee for Pavy {
         "pavy".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("python3");
         command.arg("/root/pavy/scripts/pavy.py");
         command.arg(path);

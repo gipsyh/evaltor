@@ -1,14 +1,13 @@
-use std::fs::read_dir;
+use std::{collections::HashSet, fs::read_dir, path::PathBuf};
 
-fn search_cases(path: &str, format: &str) -> Vec<String> {
-    dbg!(path);
+fn search_cases(path: &str, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
     for entry in read_dir(path).unwrap() {
         let path = entry.unwrap().path();
         if path.is_file() {
             if let Some(extension) = path.extension() {
                 if extension.eq_ignore_ascii_case(&format) {
-                    cases.push(path.to_str().unwrap().to_string());
+                    cases.push(path);
                 }
             }
         } else if path.is_dir() {
@@ -28,7 +27,7 @@ pub enum Format {
 
 pub struct Benchmark {
     name: String,
-    path: String, 
+    path: String,
     format: String,
 }
 
@@ -45,7 +44,50 @@ impl Benchmark {
         &self.name
     }
 
-    pub fn cases(&self) -> Vec<String> {
+    pub fn cases(&self) -> Vec<PathBuf> {
         search_cases(&self.path, &self.format)
+    }
+}
+
+#[derive(Default)]
+pub struct MultiBenchmark {
+    name: Option<String>,
+    benchs: Vec<Benchmark>,
+}
+
+impl MultiBenchmark {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn name(&self) -> &str {
+        if let Some(n) = &self.name {
+            &n
+        } else {
+            &self.benchs[0].name
+        }
+    }
+
+    pub fn set_name(mut self, name: &str) -> Self {
+        self.name = Some(name.to_string());
+        self
+    }
+
+    pub fn add(mut self, b: Benchmark) -> Self {
+        self.benchs.push(b);
+        self
+    }
+
+    pub fn cases(&self) -> Vec<PathBuf> {
+        let cases: Vec<PathBuf> = self.benchs.iter().map(|b| b.cases()).flatten().collect();
+        let mut seen_filenames = HashSet::new();
+        let mut res = Vec::new();
+        for case in cases {
+            let filename = case.file_name().unwrap();
+            if seen_filenames.insert(filename.to_owned()) {
+                res.push(case);
+            }
+        }
+        res
     }
 }

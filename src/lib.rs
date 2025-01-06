@@ -4,10 +4,10 @@ pub mod bench;
 pub mod evaluatees;
 mod worker;
 
-use bench::Benchmark;
+use bench::MultiBenchmark;
 use chrono::Local;
 use regex::Regex;
-use std::{process::Command, sync::Arc, thread::spawn, time::Duration};
+use std::{path::PathBuf, process::Command, sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
 
 #[derive(Debug, Clone, Copy)]
@@ -24,7 +24,7 @@ pub trait Evaluatee: Send + Sync {
         "v0".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command;
+    fn evaluate(&self, path: &PathBuf) -> Command;
 
     fn parallelism(&self) -> usize {
         1
@@ -32,7 +32,7 @@ pub trait Evaluatee: Send + Sync {
 }
 
 pub struct Evaluation {
-    benchmark: Benchmark,
+    benchmark: MultiBenchmark,
     evaluatees: Vec<Arc<dyn Evaluatee>>,
     timeout: Duration,
     memory_limit: usize,
@@ -41,7 +41,7 @@ pub struct Evaluation {
 }
 
 impl Evaluation {
-    pub fn new(benchmark: Benchmark) -> Self {
+    pub fn new(benchmark: MultiBenchmark) -> Self {
         Self {
             benchmark,
             evaluatees: Vec::new(),
@@ -52,27 +52,32 @@ impl Evaluation {
         }
     }
 
-    pub fn exclude(&mut self, e: &str) {
-        self.exclude.push(Regex::new(e).unwrap())
+    pub fn exclude(mut self, e: &str) -> Self {
+        self.exclude.push(Regex::new(e).unwrap());
+        self
     }
 
-    pub fn set_timeout(&mut self, timeout: Duration) {
-        self.timeout = timeout
+    pub fn set_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = timeout;
+        self
     }
 
-    pub fn set_memory_limit(&mut self, memory_limit: usize) {
-        self.memory_limit = memory_limit
+    pub fn set_memory_limit(mut self, memory_limit: usize) -> Self {
+        self.memory_limit = memory_limit;
+        self
     }
 
-    pub fn set_test_cores(&mut self, test_cores: usize) {
-        self.test_cores = test_cores
+    pub fn set_test_cores(mut self, test_cores: usize) -> Self {
+        self.test_cores = test_cores;
+        self
     }
 
-    pub fn add_evaluatee(&mut self, evaluatee: impl Evaluatee + 'static) {
+    pub fn add_evaluatee(mut self, evaluatee: impl Evaluatee + 'static) -> Self {
         self.evaluatees.push(Arc::new(evaluatee));
+        self
     }
 
-    pub fn evaluate(&mut self) {
+    pub fn evaluate(self) {
         for evaluatee in self.evaluatees.iter() {
             let test_cores = self.test_cores / evaluatee.parallelism();
             let file = format!(
@@ -83,7 +88,11 @@ impl Evaluation {
                 evaluatee.version(),
             );
             let mut cases = self.benchmark.cases();
-            cases.retain(|f| self.exclude.iter().all(|r| !r.is_match(f)));
+            cases.retain(|f| {
+                self.exclude
+                    .iter()
+                    .all(|r| !r.is_match(f.to_str().unwrap()))
+            });
             let share = Arc::new(Share::new(cases, file, self.timeout, self.memory_limit));
             let mut joins = Vec::new();
             for _ in 0..test_cores {

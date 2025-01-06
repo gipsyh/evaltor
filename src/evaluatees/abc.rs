@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
 
 pub struct Pdr;
 
@@ -12,7 +12,8 @@ impl Evaluatee for Pdr {
         "standard".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; pdr -n");
         let mut command = Command::new("../abc/build/abc");
         command.arg("-c").arg(path);
@@ -27,7 +28,8 @@ impl Evaluatee for BMC {
         "abcbmc".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; bmc3");
         let mut command = Command::new("/usr/local/bin/abc");
         command.arg("-c").arg(path);
@@ -42,7 +44,8 @@ impl Evaluatee for IMC {
         "abcimc".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; int");
         let mut command = Command::new("/usr/local/bin/abc");
         command.arg("-c").arg(path);
@@ -57,7 +60,8 @@ impl Evaluatee for KIND {
         "abckind".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; ind");
         let mut command = Command::new("/usr/local/bin/abc");
         command.arg("-c").arg(path);
@@ -72,7 +76,7 @@ impl Evaluatee for SuperProve {
         "abcsp".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command =
             Command::new("/root/super-prove-build/build/super_prove/bin/super_prove.sh");
         command.arg(path);

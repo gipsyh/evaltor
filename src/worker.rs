@@ -4,14 +4,14 @@ use process_control::{ChildExt, Control};
 use std::{
     fs::File,
     io::{self, Read, Write},
-    path::Path,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
 
 struct RaceShare {
-    cases: Vec<String>,
+    cases: Vec<PathBuf>,
     res_file: File,
     log_file: File,
     pb: ProgressBar,
@@ -24,7 +24,7 @@ pub struct Share {
 }
 
 impl Share {
-    pub fn new(cases: Vec<String>, file: String, timeout: Duration, memory_limit: usize) -> Self {
+    pub fn new(cases: Vec<PathBuf>, file: String, timeout: Duration, memory_limit: usize) -> Self {
         let result_file = format!("{}.txt", file);
         let log_file = format!("{}.log", file);
         let res_file = File::create(Path::new(&result_file)).unwrap();
@@ -49,13 +49,13 @@ impl Share {
         }
     }
 
-    fn get_case(&self) -> Option<String> {
+    fn get_case(&self) -> Option<PathBuf> {
         self.race.lock().unwrap().cases.pop()
     }
 
     fn submit_result<R: Read, E: Read>(
         &self,
-        case: String,
+        case: PathBuf,
         res: EvaluationResult,
         mut log: R,
         mut stderr: E,
@@ -66,7 +66,7 @@ impl Share {
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
         };
-        let out = format!("{} {}\n", case, out_time);
+        let out = format!("{:?} {}\n", case.file_name().unwrap(), out_time);
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
         let _ = io::copy(&mut log, &mut race.log_file);
@@ -90,7 +90,7 @@ impl Worker {
         Self { evaluatee, share }
     }
 
-    fn evaluate(&self, case: String, mut command: Command) {
+    fn evaluate(&self, case: PathBuf, mut command: Command) {
         let mut child = command
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

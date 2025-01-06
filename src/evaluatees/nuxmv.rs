@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::{process::Command, thread};
+use std::{path::PathBuf, process::Command, thread};
 
 pub struct IC3;
 
@@ -8,7 +8,8 @@ impl Evaluatee for IC3 {
         "nuXmv".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let path = path.as_path().to_str().unwrap();
         let stdin = format!(
             "read_aiger_model -i {path}
             encode_variables

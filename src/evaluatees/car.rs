@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::process::Command;
+use std::{path::PathBuf, process::Command};
 
 pub struct Car;
 
@@ -12,7 +12,7 @@ impl Evaluatee for Car {
         "backward".to_string()
     }
 
-    fn evaluate(&self, path: &str) -> Command {
+    fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("../simplecar/simplecar");
         command.arg("-b");
         command.arg(path);
