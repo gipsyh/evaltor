@@ -9,7 +9,7 @@ impl Evaluatee for RIC3 {
     }
 
     fn version(&self) -> String {
-        "v0".to_string()
+        "dynamic".to_string()
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
@@ -17,8 +17,9 @@ impl Evaluatee for RIC3 {
         command.arg(path);
         command.arg("-e");
         command.arg("ic3");
+        command.arg("--ic3-ctg");
+        command.arg("--ic3-dynamic");
         // command.arg("--ic3-no-dynamic");
-        // command.arg("--ic3-ctg");
         // command.arg("--ic3-ctg-limit");
         // command.arg("5");
         // command.arg("--certify");

@@ -66,7 +66,7 @@ impl Share {
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
         };
-        let out = format!("{:?} {}\n", case.file_name().unwrap(), out_time);
+        let out = format!("{} {}\n", case.as_path().to_str().unwrap(), out_time);
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
         let _ = io::copy(&mut log, &mut race.log_file);
