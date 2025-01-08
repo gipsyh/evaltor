@@ -1,5 +1,7 @@
 use std::{collections::HashSet, fs::read_dir, path::PathBuf};
 
+use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
+
 fn search_cases(path: &str, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
     for entry in read_dir(path).unwrap() {
@@ -88,6 +90,8 @@ impl MultiBenchmark {
                 res.push(case);
             }
         }
+        let mut rng = StdRng::seed_from_u64(0);
+        res.shuffle(&mut rng);
         res
     }
 }

@@ -14,7 +14,7 @@ impl Evaluatee for IC3 {
             "read_aiger_model -i {path}
             encode_variables
             build_boolean_model
-            check_invar_ic3 -d
+            check_invar_ic3 -d -g
             quit"
         );
         let file = format!("/tmp/evaluator/{}", thread::current().id().as_u64());

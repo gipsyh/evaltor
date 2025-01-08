@@ -9,13 +9,13 @@ impl Evaluatee for Pdr {
     }
 
     fn version(&self) -> String {
-        "standard".to_string()
+        "nct".to_string()
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let path = path.as_path().to_str().unwrap();
-        let path = format!("read {path}; logic; undc; strash; zero; pdr -n");
-        let mut command = Command::new("../abc/build/abc");
+        let path = format!("read {path}; logic; undc; strash; zero; pdr -nct");
+        let mut command = Command::new("../rIC3-CAV25/abc/build/abc");
         command.arg("-c").arg(path);
         command
     }
