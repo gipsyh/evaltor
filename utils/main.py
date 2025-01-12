@@ -6,10 +6,11 @@ ric3 = Evaluatee("../rIC3-CAV25/result/rIC3-ic3.txt")
 abc = Evaluatee("../rIC3-CAV25/result/ABC-pdr.txt")
 ic3ref = Evaluatee("../rIC3-CAV25/result/IC3ref.txt")
 nuxmv_ic3 = Evaluatee("../rIC3-CAV25/result/nuXmv-ic3.txt")
+avr = Evaluatee("../rIC3-CAV25/result/AVR.txt")
+pono_ic3sa = Evaluatee("../rIC3-CAV25/result/Pono-ic3sa.txt")
 
-evaluatee = [ric3, abc, ic3ref, nuxmv_ic3]
+evaluatee = [ric3, abc, ic3ref, nuxmv_ic3, avr, pono_ic3sa]
 for e in evaluatee:
     e.summary()
 
 plot(evaluatee)
-
