@@ -26,6 +26,13 @@ pub trait Evaluatee: Send + Sync {
 
     fn evaluate(&self, path: &PathBuf) -> Command;
 
+    fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
+        match code {
+            0 => EvaluationResult::Success(time),
+            _ => EvaluationResult::Failed,
+        }
+    }
+
     fn parallelism(&self) -> usize {
         1
     }

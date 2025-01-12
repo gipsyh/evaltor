@@ -105,8 +105,8 @@ impl Worker {
             .unwrap();
         let time = start.elapsed();
         let res = if let Some(status) = output {
-            if let Some(0 | 1 | 10 | 20) = status.code() {
-                EvaluationResult::Success(time)
+            if let Some(code) = status.code() {
+                self.evaluatee.result_analyse(code, time)
             } else {
                 EvaluationResult::Failed
             }

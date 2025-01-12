@@ -1,6 +1,13 @@
 use crate::Evaluatee;
 use std::{path::PathBuf, process::Command};
 
+fn result_analyse(code: i64, time: std::time::Duration) -> crate::EvaluationResult {
+    match code {
+        10 | 20 => crate::EvaluationResult::Success(time),
+        _ => crate::EvaluationResult::Failed,
+    }
+}
+
 pub struct RIC3;
 
 impl Evaluatee for RIC3 {
@@ -25,6 +32,10 @@ impl Evaluatee for RIC3 {
         // command.arg("--certify");
         // command.arg("--ic3-inn");
         command
+    }
+
+    fn result_analyse(&self, code: i64, time: std::time::Duration) -> crate::EvaluationResult {
+        result_analyse(code, time)
     }
 }
 
@@ -112,16 +123,20 @@ impl Evaluatee for Portfolio {
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3-HWMCC24/rIC3");
+        let mut command = Command::new("../rIC3/target/release/rIC3");
         command.arg("-e");
         command.arg("portfolio");
-        command.arg("--certify");
+        // command.arg("--certify");
         command.arg(path);
         command
     }
 
     fn parallelism(&self) -> usize {
         16
+    }
+
+    fn result_analyse(&self, code: i64, time: std::time::Duration) -> crate::EvaluationResult {
+        result_analyse(code, time)
     }
 }
 

@@ -78,7 +78,7 @@ impl Evaluatee for SuperProve {
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command =
-            Command::new("/root/super-prove-build/build/super_prove/bin/super_prove.sh");
+            Command::new("/root/rIC3-CAV25/super-prove-build/build/super_prove/bin/super_prove.sh");
         command.arg(path);
         command
     }
