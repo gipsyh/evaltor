@@ -1,88 +1,67 @@
 import matplotlib.pyplot as plt
-import sys
 from scipy.stats import gmean
-
-timeout = 3600
-
-
-def parse_time(time):
-    if time == "Timeout":
-        return timeout
-    elif time == "Failed":
-        return timeout
-    else:
-        time = float(time)
-        if time < 0.01:
-            time = 0.01
-        return min(time, timeout)
+from evaluatee import Evaluatee
+import math
 
 
-if __name__ == "__main__":
-    data = {}
-    name = []
-    for file in sys.argv[1:3]:
-        name.append(file)
-        with open(file, "r") as f:
-            for line in f:
-                case, time = line.strip().split()
-                case = case.rsplit("/", 1)[-1]
-                if case.endswith(".aag") or case.endswith(".aig"):
-                    case = case[:-4]
-                if case in data:
-                    data[case].append(time)
-                else:
-                    data[case] = [time]
-
+def scatter_single(fg, x: Evaluatee, y: Evaluatee):
     X = []
     Y = []
     num_x = 0
     num_y = 0
-    keys = sorted(data.keys())
     speedup = []
-    for key in keys:
-        if len(data[key]) < 2:
+    for case in x.cases():
+        xt, yt = x[case], y[case]
+        if xt is None and yt is None:
             continue
-        bsdp = data[key][0] == "Timeout" or data[key][1] == "Timeout"
-        x = parse_time(data[key][0])
-        y = parse_time(data[key][1])
-        X.append(x)
-        Y.append(y)
-
-        if x <= 1 or y <= 1:
+        bsdp = xt is None or yt is None
+        xt = x.TIMEOUT if xt is None else max(xt, 0.1)
+        yt = y.TIMEOUT if yt is None else max(yt, 0.1)
+        X.append(xt)
+        Y.append(yt)
+        if xt <= 1 and yt <= 1:
             continue
         if not bsdp:
-            speedup.append(y / x)
-        if x < y:
+            speedup.append(yt / xt)
+        if xt < yt:
             num_x += 1
-        elif x > y:
+        elif xt > yt:
             num_y += 1
 
-    print((num_x, num_y))
-    gmean = gmean(speedup)
-    print(gmean)
-    plt.axis("equal")
-    plt.scatter(X, Y, marker="x")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.xlabel(name[0])
-    plt.ylabel(name[1])
-    plt.xlim(0.1, timeout + 500)
-    plt.ylim(0.1, timeout + 500)
-    plt.plot([0, timeout], [0, timeout], linestyle="dashed", color="grey")
-    # plt.plot([0, timeout], [0, timeout * gmean], linestyle='dashed', color="#721454")
-    plt.show()
-    fig = plt.gcf()
-    fig.set_size_inches(5, 5)
-    plt.savefig("scatter.png", dpi=500)
+    print(num_x, num_y)
+    gm = gmean(speedup)
+    print(1 / gm)
+    fg.scatter(X, Y, marker="x", s=25, linewidths=1)
+    fg.set_aspect("equal")
+    fg.set_xscale("log")
+    fg.set_yscale("log")
+    fg.set_xlabel(x.name, fontsize=12)
+    fg.set_ylabel(y.name, fontsize=12)
+    fg.yaxis.set_label_coords(-0.11, 0.5)
+    fg.set_xlim(0.1, x.TIMEOUT * 1.2)
+    fg.set_ylim(0.1, y.TIMEOUT * 1.2)
+    fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT], color="grey", linestyle="dashed")
+    loc = [0.1, 1, 10, 100, 1000, 3600]
+    lab = ["0.1", "1", r"$10^1$", r"$10^2$", r"$10^3$", "TO"]
+    fg.set_xticks(loc, lab)
+    fg.set_yticks(loc, lab)
+    # fg.text(
+    #     0.05,
+    #     0.95,
+    #     transform=fg.transAxes,
+    #     fontsize=12,
+    #     verticalalignment="top",
+    #     horizontalalignment="left",
+    # )
 
-    num_x_solved = 0
-    for x in X:
-        if x < timeout:
-            num_x_solved += 1
-    
-    num_y_solved = 0
-    for y in Y:
-        if y < timeout:
-            num_y_solved += 1
-    
-    print(num_x_solved, num_y_solved)
+
+def scatter(evaluatee: list[Evaluatee], plot_x=4):
+    plot_x = 3
+    plot_y = int(math.ceil((len(evaluatee) - 1) / plot_x))
+    fig, ax = plt.subplots(plot_y, plot_x, figsize=(4 * plot_x, 4 * plot_y))
+    ax = [x for sub_ax in ax for x in sub_ax]
+    for e, subax in zip(evaluatee[1:], ax):
+        scatter_single(subax, evaluatee[0], e)
+    plt.tight_layout()
+    fig.show()
+    fig.savefig("scatter.png", dpi=500)

@@ -1,5 +1,6 @@
 from evaluatee import Evaluatee
 from plot import plot
+from scatter import scatter
 
 
 ric3 = Evaluatee("../rIC3-CAV25/result/rIC3-ic3.txt")
@@ -13,4 +14,5 @@ evaluatee = [ric3, abc, ic3ref, nuxmv_ic3, avr, pono_ic3sa]
 for e in evaluatee:
     e.summary()
 
-plot(evaluatee)
+# plot(evaluatee)
+scatter(evaluatee)

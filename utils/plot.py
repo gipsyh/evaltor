@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 from evaluatee import Evaluatee
 
 
-def sub_plot(fg, e: Evaluatee, line=None):
-    # def sub_plot(fg, res, labels, colors, linestyles):
+def plot_single(fg, e: Evaluatee, line=None):
     data = list(e.data.values())
     data = sorted(data)
     X = []
@@ -23,17 +22,12 @@ def sub_plot(fg, e: Evaluatee, line=None):
 
 
 def plot(evaluatee: list[Evaluatee]):
-    fig, (ax1) = plt.subplots(1, 1, figsize=(8, 3.8))
-
-    line = ["-", "-.", ":", "--"]
+    fig, (ax1) = plt.subplots(1, 1)
+    line = ["-", "-.", ":", (0, (3, 3)), (0, (5, 5)), (0, (3, 5, 1, 5))]
     if len(line) < len(evaluatee):
         line.extend([None] * (len(evaluatee) - len(line)))
     for e, l in zip(evaluatee, line):
-        sub_plot(
-            ax1,
-            e,
-            l,
-        )
+        plot_single(ax1, e, l)
     max_sol = max(e.num_success() for e in evaluatee)
     min_sol = min(e.num_success() for e in evaluatee)
     ax1.set_xlabel("Time(s)")

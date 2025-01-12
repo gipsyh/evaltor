@@ -15,6 +15,7 @@ class Evaluatee:
         with open(file, "r") as file:
             for line in file:
                 case, time = line.strip().split()
+                case = case.rsplit("/", 1)[-1]
                 case = case.rsplit(".", 1)[0] if "." in case else case
                 if time == "Timeout":
                     self.timeout.add(case)
@@ -26,6 +27,12 @@ class Evaluatee:
                         self.timeout.add(case)
                     else:
                         self.data[case] = time
+                        
+    def __getitem__(self, key):
+        return self.data.get(key)
+    
+    def cases(self) -> list[str]:
+        return list(self.data.keys() | self.timeout | self.memout)
 
     def num_success(self) -> int:
         return len(self.data)
