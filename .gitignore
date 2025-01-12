@@ -2,6 +2,7 @@
 /Cargo.lock
 /result
 merge-result
-result.png
+plot.png
 scatter.png
 best-result
+__pycache__

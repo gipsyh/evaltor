@@ -1,32 +1,45 @@
 import matplotlib.pyplot as plt
-import sys
+from evaluatee import Evaluatee
 
-TIMEOUT = 3600
 
-if __name__ == "__main__":
-    for file_name in sys.argv[1:]:
-        data = []
-        par2 = 0
-        cases = 0
-        with open(file_name, "r") as file:
-            for line in file:
-                model, time = line.strip().split()
-                cases += 1
-                if time != "Timeout" and time != "Failed":
-                    t = float(time)
-                    data.append(float(time))
-                    par2 += t
-                else:
-                    par2 += TIMEOUT * 2
-        data = sorted(data)
-        print(
-            file_name, "{}/{}".format(len(data), cases), "{:.2f}".format(par2 / cases)
+def sub_plot(fg, e: Evaluatee):
+    # def sub_plot(fg, res, labels, colors, linestyles):
+    data = list(e.data.values())
+    data = sorted(data)
+    label = e.name
+    X = []
+    Y = []
+    for t in range(0, e.TIMEOUT + 1, 30):
+        X.append(t)
+        Y.append(sum(1 for d in data if d <= t))
+    fg.plot(
+        X,
+        Y,
+        label=label,
+        # color=color,
+        # linestyle=linestyle,
+        linewidth=1.3,
+        markerfacecolor="none",
+    )
+
+
+def plot(evaluatee: list[Evaluatee]):
+    fig, (ax1) = plt.subplots(1, 1, figsize=(6, 3.8))
+
+    # ["green", "#2E77B2", "orange", "red"],
+    # ["-.", ":", "--", "-"],
+    for e in evaluatee:
+        sub_plot(
+            ax1,
+            e,
         )
-        plt.plot(range(len(data)), data, marker="x", label=file_name)
+    max_sol = max(e.num_success() for e in evaluatee)
+    min_sol = min(e.num_success() for e in evaluatee)
+    ax1.set_xlabel("Time(s)")
+    ax1.set_ylabel("Cases Solved")
+    ax1.legend()
+    ax1.set_ylim(min_sol * 0.5, max_sol + 10)
 
-    plt.title("result")
-    plt.xlabel("solved")
-    plt.ylabel("time")
-    plt.legend()
+    plt.subplots_adjust(wspace=0)
     plt.show()
-    plt.savefig("result.png", dpi=500)
+    plt.savefig("plot.png", dpi=1000)
