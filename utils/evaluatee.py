@@ -27,30 +27,32 @@ class Evaluatee:
                         self.timeout.add(case)
                     else:
                         self.data[case] = time
-                        
+
     def __getitem__(self, key):
         return self.data.get(key)
-    
+
     def cases(self) -> list[str]:
         return list(self.data.keys() | self.timeout | self.memout)
 
-    def num_success(self) -> int:
+    def num_solved(self) -> int:
         return len(self.data)
 
     def num_failed(self) -> int:
         return len(self.timeout) + len(self.memout)
 
     def num_total(self) -> int:
-        return self.num_success() + self.num_failed()
+        return self.num_solved() + self.num_failed()
 
     def par2(self) -> float:
-        return (
-            sum(self.data.values()) + self.num_failed() * 2 * self.TIMEOUT
-        ) / self.num_total()
+        return round(
+            (sum(self.data.values()) + self.num_failed() * 2 * self.TIMEOUT)
+            / self.num_total(),
+            2,
+        )
 
     def summary(self):
         print(
             self.name,
-            "{}/{}".format(self.num_success(), self.num_total()),
+            "{}/{}".format(self.num_solved(), self.num_total()),
             "par2: {:.2f}".format(self.par2()),
         )

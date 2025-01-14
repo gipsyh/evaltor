@@ -22,14 +22,14 @@ def plot_single(fg, e: Evaluatee, line=None):
 
 
 def plot(evaluatee: list[Evaluatee]):
-    fig, (ax1) = plt.subplots(1, 1)
-    line = ["-", "-.", ":", (0, (3, 3)), (0, (5, 5)), (0, (3, 5, 1, 5))]
+    fig, (ax1) = plt.subplots(1, 1, figsize=(8, 3.8))
+    line = ["-", "-.", ":", (0, (3, 3)), (0, (5, 5)), (0, (3, 5, 1, 5)), (0, (7, 7))]
     if len(line) < len(evaluatee):
         line.extend([None] * (len(evaluatee) - len(line)))
     for e, l in zip(evaluatee, line):
         plot_single(ax1, e, l)
-    max_sol = max(e.num_success() for e in evaluatee)
-    min_sol = min(e.num_success() for e in evaluatee)
+    max_sol = max(e.num_solved() for e in evaluatee)
+    min_sol = min(e.num_solved() for e in evaluatee)
     ax1.set_xlabel("Time(s)")
     ax1.set_ylabel("Cases Solved")
     ax1.legend(bbox_to_anchor=(1.05, 0.5), loc="center left", frameon=False)
