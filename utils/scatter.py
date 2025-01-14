@@ -59,7 +59,8 @@ def scatter(evaluatee: list[Evaluatee], plot_x=4):
     plot_x = 3
     plot_y = int(math.ceil((len(evaluatee) - 1) / plot_x))
     fig, ax = plt.subplots(plot_y, plot_x, figsize=(4 * plot_x, 4 * plot_y))
-    ax = [x for sub_ax in ax for x in sub_ax]
+    if isinstance(ax[0], list):
+        ax = [x for sub_ax in ax for x in sub_ax]
     for e, subax in zip(evaluatee[1:], ax):
         scatter_single(subax, evaluatee[0], e)
     plt.tight_layout()

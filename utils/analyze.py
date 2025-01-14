@@ -32,7 +32,7 @@ def analyze(evaluatee: list[Evaluatee]):
                 "TO": len(e.timeout),
                 "MO": len(e.memout),
                 "Total": e.num_total(),
-                "PAR2": e.par2(),
+                "PAR-2": e.par2(),
                 "Unique": len(unique[e]),
                 "Best": len(best[e]),
             }
