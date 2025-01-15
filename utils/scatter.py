@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import gmean
 from evaluatee import Evaluatee
 import math
+import numpy as np
 
 
 def scatter_single(fg, x: Evaluatee, y: Evaluatee):
@@ -59,7 +60,7 @@ def scatter(evaluatee: list[Evaluatee], plot_x=4):
     plot_x = 3
     plot_y = int(math.ceil((len(evaluatee) - 1) / plot_x))
     fig, ax = plt.subplots(plot_y, plot_x, figsize=(4 * plot_x, 4 * plot_y))
-    if isinstance(ax[0], list):
+    if isinstance(ax[0], list) or isinstance(ax[0], np.ndarray):
         ax = [x for sub_ax in ax for x in sub_ax]
     for e, subax in zip(evaluatee[1:], ax):
         scatter_single(subax, evaluatee[0], e)
