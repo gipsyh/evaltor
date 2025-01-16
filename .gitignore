@@ -1,6 +1,7 @@
 /target
 /Cargo.lock
 /result
+/result_old
 merge-result
 plot.png
 scatter.png

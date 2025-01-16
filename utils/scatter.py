@@ -67,3 +67,10 @@ def scatter(evaluatee: list[Evaluatee], plot_x=4):
     plt.tight_layout()
     fig.show()
     fig.savefig("scatter.png", dpi=500)
+
+if __name__ == "__main__":
+    import sys
+    evaluatee = []
+    for file in sys.argv[1:]:
+        evaluatee.append(Evaluatee(file))
+    scatter(evaluatee)

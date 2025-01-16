@@ -35,7 +35,6 @@ def plot(evaluatee: list[Evaluatee]):
     ax1.legend(bbox_to_anchor=(1.05, 0.5), loc="center left", frameon=False)
     ax1.set_ylim(min_sol * 0.5, max_sol + 20)
 
-    # plt.subplots_adjust(wspace=0)
     plt.subplots_adjust(right=0.7)
     plt.show()
     plt.savefig("plot.png", dpi=1000)

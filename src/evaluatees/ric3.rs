@@ -150,3 +150,17 @@ impl Evaluatee for RIC3Dev {
         command
     }
 }
+
+pub struct IC3Minisat;
+
+impl Evaluatee for IC3Minisat {
+    fn name(&self) -> String {
+        "rIC3-minisat".to_string()
+    }
+
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let mut command = Command::new("../fm24/FM2024/rIC3/target/release/rIC3");
+        command.arg(path);
+        command
+    }
+}

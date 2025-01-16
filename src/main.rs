@@ -17,14 +17,14 @@ fn main() {
     );
 
     let bench = MultiBenchmark::new()
-        .set_name("hwmcc192024")
-        .add(hwmcc19)
+        .set_name("hwmcc2024")
+        // .add(hwmcc19)
         .add(hwmcc20)
         .add(hwmcc24);
     Evaluation::new(bench)
         .set_timeout(Duration::from_secs(3600))
         .set_memory_limit(1024 * 1024 * 1024 * 16)
-        .add_evaluatee(evaluatees::nuxmv::IGoodLemma)
+        .add_evaluatee(evaluatees::ric3::IC3Minisat)
         .evaluate();
     // evaluation.exclude(r"cal(?:2|156|192|201|206|209|210|220|224|227|234)\.aig$");
     // evaluation.exclude(r"mul[123]\.aig$");
