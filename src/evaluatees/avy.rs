@@ -1,5 +1,5 @@
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command, time::Duration};
+use std::{path::PathBuf, process::Command};
 
 use super::{result_analyse, EvaluationResult};
 
