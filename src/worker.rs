@@ -1,4 +1,4 @@
-use crate::{Evaluatee, EvaluationResult};
+use crate::{evaluatees::EvaluationResult, Evaluatee};
 use indicatif::ProgressBar;
 use process_control::{ChildExt, Control};
 use std::{

@@ -1,12 +1,7 @@
-use crate::{Evaluatee, EvaluationResult};
+use crate::Evaluatee;
 use std::{path::PathBuf, process::Command, time::Duration};
 
-fn result_analyse(code: i64, time: Duration) -> EvaluationResult {
-    match code {
-        0 | 1 => EvaluationResult::Success(time),
-        _ => EvaluationResult::Failed,
-    }
-}
+use super::{result_analyse, EvaluationResult};
 
 pub struct Avy;
 
@@ -40,7 +35,7 @@ impl Evaluatee for Pavy {
         16
     }
 
-    fn result_analyse(&self, code: i64, time: std::time::Duration) -> crate::EvaluationResult {
-        result_analyse(code, time)
+    fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
+        result_analyse(code, time, |c| matches!(c, 0 | 1))
     }
 }

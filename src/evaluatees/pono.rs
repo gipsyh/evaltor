@@ -1,13 +1,8 @@
-use crate::{Evaluatee, EvaluationResult};
+use super::{result_analyse, EvaluationResult};
+use crate::Evaluatee;
 use std::{path::PathBuf, process::Command, time::Duration};
-pub struct IC3sa;
 
-fn result_analyse(code: i64, time: Duration) -> EvaluationResult {
-    match code {
-        0 | 1 => EvaluationResult::Success(time),
-        _ => EvaluationResult::Failed,
-    }
-}
+pub struct IC3sa;
 
 impl Evaluatee for IC3sa {
     fn name(&self) -> String {
@@ -37,7 +32,7 @@ impl Evaluatee for IC3ia {
     }
 
     fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
-        result_analyse(code, time)
+        result_analyse(code, time, |c| matches!(c, 0 | 1))
     }
 }
 
@@ -56,6 +51,6 @@ impl Evaluatee for IC3bits {
     }
 
     fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
-        result_analyse(code, time)
+        result_analyse(code, time, |c| matches!(c, 0 | 1))
     }
 }

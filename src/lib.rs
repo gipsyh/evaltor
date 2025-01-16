@@ -6,37 +6,10 @@ mod worker;
 
 use bench::MultiBenchmark;
 use chrono::Local;
+use evaluatees::Evaluatee;
 use regex::Regex;
-use std::{path::PathBuf, process::Command, sync::Arc, thread::spawn, time::Duration};
+use std::{sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
-
-#[derive(Debug, Clone, Copy)]
-pub enum EvaluationResult {
-    Success(Duration),
-    Timeout,
-    Failed,
-}
-
-pub trait Evaluatee: Send + Sync {
-    fn name(&self) -> String;
-
-    fn version(&self) -> String {
-        "v0".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command;
-
-    fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
-        match code {
-            0 => EvaluationResult::Success(time),
-            _ => EvaluationResult::Failed,
-        }
-    }
-
-    fn parallelism(&self) -> usize {
-        1
-    }
-}
 
 pub struct Evaluation {
     benchmark: MultiBenchmark,
