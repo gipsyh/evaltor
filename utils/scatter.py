@@ -20,7 +20,7 @@ def scatter_single(fg, x: Evaluatee, y: Evaluatee):
         yt = y.TIMEOUT if yt is None else max(yt, 0.1)
         X.append(xt)
         Y.append(yt)
-        if xt <= 1 and yt <= 1:
+        if xt <= 5 and yt <= 5:
             continue
         if not bsdp:
             speedup.append(yt / xt)
