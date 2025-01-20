@@ -5,6 +5,20 @@ import math
 import numpy as np
 
 
+def cal_ticks(max_val):
+    loc = [0.1, 1]
+    lab = ["0.1", "1"]
+    exp = 1
+    now = 10
+    while now < max_val:
+        lab.append(r"$10^" + str(exp) + "$")
+        loc.append(now)
+        now *= 10
+        exp += 1
+    lab.append("TO")
+    loc.append(max_val)
+    return loc, lab
+
 def scatter_single(fg, x: Evaluatee, y: Evaluatee):
     X = []
     Y = []
@@ -23,6 +37,8 @@ def scatter_single(fg, x: Evaluatee, y: Evaluatee):
         if xt <= 5 and yt <= 5:
             continue
         if not bsdp:
+            # if yt > xt:
+            #     print(f"{case} {yt} > {xt}")
             speedup.append(yt / xt)
         if xt < yt:
             num_x += 1
@@ -42,18 +58,10 @@ def scatter_single(fg, x: Evaluatee, y: Evaluatee):
     fg.set_xlim(0.1, x.TIMEOUT * 1.2)
     fg.set_ylim(0.1, y.TIMEOUT * 1.2)
     fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT], color="grey", linestyle="dashed")
-    loc = [0.1, 1, 10, 100, 1000, 3600]
-    lab = ["0.1", "1", r"$10^1$", r"$10^2$", r"$10^3$", "TO"]
+    fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT * gm], linestyle='dashed', color="#721454")
+    loc, lab = cal_ticks(x.TIMEOUT)
     fg.set_xticks(loc, lab)
     fg.set_yticks(loc, lab)
-    # fg.text(
-    #     0.05,
-    #     0.95,
-    #     transform=fg.transAxes,
-    #     fontsize=12,
-    #     verticalalignment="top",
-    #     horizontalalignment="left",
-    # )
 
 
 def scatter(evaluatee: list[Evaluatee], plot_x=4):

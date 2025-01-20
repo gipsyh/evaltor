@@ -40,3 +40,10 @@ def analyze(evaluatee: list[Evaluatee]):
 
     df = pd.DataFrame(data)
     print(df)
+
+if __name__ == "__main__":
+    import sys
+    evaluatee = []
+    for file in sys.argv[1:]:
+        evaluatee.append(Evaluatee(file))
+    analyze(evaluatee)
