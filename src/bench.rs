@@ -18,6 +18,9 @@ fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
     }
     cases.sort();
     cases
+        .into_iter()
+        .map(|c| c.canonicalize().unwrap())
+        .collect()
 }
 
 pub enum Format {

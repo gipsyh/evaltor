@@ -113,24 +113,28 @@ impl Worker {
         }
     }
 
-    async fn evaluate(&self, case: PathBuf, mut command: Command) {
+    async fn evaluate(&self, case: PathBuf, command: Command) {
         let container_name = "ubuntu";
         let binds = self
             .share
             .bench
             .mount()
             .iter()
+            .chain(self.evaluatee.mount().iter())
             .map(|b| format!("{}:{}:ro", b.display(), b.display()))
             .collect();
         let host_config = HostConfig {
             memory: Some(self.share.memory_limit as i64),
+            cpu_count: Some(self.evaluatee.parallelism() as i64),
             binds: Some(binds),
             ..Default::default()
         };
+        let mut cmd = vec![command.get_program().to_str().unwrap()];
+        cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
             image: Some("ubuntu:latest"),
             working_dir: Some("/root"),
-            cmd: Some(vec!["ls", "/Users/gipsyh/mc-benchmark/hwmcc24/aig"]),
+            cmd: Some(cmd),
             host_config: Some(host_config),
             ..Default::default()
         };
