@@ -1,34 +1,44 @@
-use crate::{evaluatees::EvaluationResult, Evaluatee};
+use crate::{bench::MultiBenchmark, evaluatees::EvaluationResult, Evaluatee};
+use bollard::{container, secret::HostConfig, Docker, API_DEFAULT_VERSION};
+use bytes::Bytes;
+use futures::{StreamExt, TryStreamExt};
 use indicatif::ProgressBar;
-use process_control::{ChildExt, Control};
 use std::{
     fs::File,
-    io::{self, Read, Write},
+    io::{BufWriter, Write},
     path::{Path, PathBuf},
-    process::{Command, Stdio},
+    process::Command,
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
+use tokio::time::timeout;
 
 struct RaceShare {
     cases: Vec<PathBuf>,
     res_file: File,
-    log_file: File,
+    log_file: BufWriter<File>,
     pb: ProgressBar,
 }
 
 pub struct Share {
     race: Mutex<RaceShare>,
+    bench: MultiBenchmark,
     timeout: Duration,
     memory_limit: usize,
 }
 
 impl Share {
-    pub fn new(cases: Vec<PathBuf>, file: String, timeout: Duration, memory_limit: usize) -> Self {
+    pub fn new(
+        bench: MultiBenchmark,
+        file: String,
+        timeout: Duration,
+        memory_limit: usize,
+    ) -> Self {
+        let cases = bench.cases();
         let result_file = format!("{}.txt", file);
         let log_file = format!("{}.log", file);
         let res_file = File::create(Path::new(&result_file)).unwrap();
-        let log_file = File::create(Path::new(&log_file)).unwrap();
+        let log_file = BufWriter::new(File::create(Path::new(&log_file)).unwrap());
         let pb = indicatif::ProgressBar::new(cases.len() as _);
         pb.set_style(
             indicatif::ProgressStyle::with_template(
@@ -44,6 +54,7 @@ impl Share {
                 log_file,
                 pb,
             }),
+            bench,
             timeout,
             memory_limit,
         }
@@ -53,12 +64,11 @@ impl Share {
         self.race.lock().unwrap().cases.pop()
     }
 
-    fn submit_result<R: Read, E: Read>(
+    fn submit_result(
         &self,
         case: PathBuf,
         res: EvaluationResult,
-        mut log: R,
-        mut stderr: E,
+        log: impl Iterator<Item = Bytes>,
     ) {
         let mut race = self.race.lock().unwrap();
         let out_time = match res {
@@ -69,8 +79,10 @@ impl Share {
         let out = format!("{} {}\n", case.as_path().to_str().unwrap(), out_time);
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
-        let _ = io::copy(&mut log, &mut race.log_file);
-        let _ = io::copy(&mut stderr, &mut race.log_file);
+        for l in log {
+            race.log_file.write_all(&l).unwrap();
+        }
+        race.log_file.flush().unwrap();
     }
 }
 
@@ -83,58 +95,104 @@ impl Drop for Share {
 pub struct Worker {
     evaluatee: Arc<dyn Evaluatee>,
     share: Arc<Share>,
+    docker: Docker,
 }
 
 impl Worker {
     pub fn new(evaluatee: Arc<dyn Evaluatee>, share: Arc<Share>) -> Self {
-        Self { evaluatee, share }
+        let docker = Docker::connect_with_unix(
+            "/Users/gipsyh/.docker/run/docker.sock",
+            120,
+            API_DEFAULT_VERSION,
+        )
+        .unwrap();
+        Self {
+            evaluatee,
+            share,
+            docker,
+        }
     }
 
-    fn evaluate(&self, case: PathBuf, mut command: Command) {
-        let mut child = command
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .unwrap();
-        let start = Instant::now();
-        let output = child
-            .controlled()
-            .time_limit(self.share.timeout)
-            .memory_limit(self.share.memory_limit)
-            .wait()
-            .unwrap();
-        let time = start.elapsed();
-        let res = if let Some(status) = output {
-            if let Some(code) = status.code() {
-                self.evaluatee.result_analyse(code, time)
-            } else {
-                EvaluationResult::Failed
-            }
-        } else {
-            let cmd = format!(
-                r#"pstree -p {} | grep -oP '\(\K\d+' | sort -u | xargs -n 1 kill -9"#,
-                child.id()
-            );
-            Command::new("sh").args(["-c", &cmd]).output().unwrap();
-            // nix::sys::signal::kill(
-            //     nix::unistd::Pid::from_raw(child.id() as i32),
-            //     nix::sys::signal::Signal::SIGINT,
-            // )
-            // .unwrap();
-            EvaluationResult::Timeout
+    async fn evaluate(&self, case: PathBuf, mut command: Command) {
+        let container_name = "ubuntu";
+        let binds = self
+            .share
+            .bench
+            .mount()
+            .iter()
+            .map(|b| format!("{}:{}:ro", b.display(), b.display()))
+            .collect();
+        let host_config = HostConfig {
+            memory: Some(self.share.memory_limit as i64),
+            binds: Some(binds),
+            ..Default::default()
         };
-        self.share.submit_result(
-            case,
-            res,
-            child.stdout.take().unwrap(),
-            child.stderr.take().unwrap(),
-        );
+        let config = container::Config {
+            image: Some("ubuntu:latest"),
+            working_dir: Some("/root"),
+            cmd: Some(vec!["ls", "/Users/gipsyh/mc-benchmark/hwmcc24/aig"]),
+            host_config: Some(host_config),
+            ..Default::default()
+        };
+        let create = self
+            .docker
+            .create_container(
+                Some(container::CreateContainerOptions {
+                    name: container_name,
+                    platform: None,
+                }),
+                config,
+            )
+            .await
+            .unwrap();
+        self.docker
+            .start_container(&create.id, None::<container::StartContainerOptions<String>>)
+            .await
+            .unwrap();
+        let wait_options = container::WaitContainerOptions {
+            condition: "not-running",
+        };
+        let mut wait = self.docker.wait_container(&create.id, Some(wait_options));
+        let start = Instant::now();
+        let res = match timeout(self.share.timeout, wait.next()).await {
+            Ok(wait_result) => match wait_result.unwrap() {
+                Ok(wait_result) => self
+                    .evaluatee
+                    .result_analyse(wait_result.status_code, start.elapsed()),
+                Err(_) => EvaluationResult::Failed,
+            },
+            Err(_) => {
+                self.docker.stop_container(&create.id, None).await.unwrap();
+                EvaluationResult::Timeout
+            }
+        };
+        let options = Some(container::LogsOptions::<String> {
+            stdout: true,
+            stderr: true,
+            ..Default::default()
+        });
+        let log = self
+            .docker
+            .logs(&create.id, options)
+            .try_collect::<Vec<_>>()
+            .await
+            .unwrap();
+        let log = log.into_iter().into_iter().map(|l| l.into_bytes());
+        self.docker
+            .remove_container(&create.id, Default::default())
+            .await
+            .unwrap();
+        self.share.submit_result(case, res, log);
     }
 
     pub fn start(self) {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
         while let Some(case) = self.share.get_case() {
             let command = self.evaluatee.evaluate(&case);
-            self.evaluate(case, command);
+            rt.block_on(self.evaluate(case, command));
         }
     }
 }

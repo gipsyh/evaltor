@@ -67,13 +67,18 @@ impl Evaluation {
                 Local::now().format("%m%d%H%M"),
                 evaluatee.version(),
             );
-            let mut cases = self.benchmark.cases();
-            cases.retain(|f| {
-                self.exclude
-                    .iter()
-                    .all(|r| !r.is_match(f.to_str().unwrap()))
-            });
-            let share = Arc::new(Share::new(cases, file, self.timeout, self.memory_limit));
+            // let mut cases = self.benchmark.cases();
+            // cases.retain(|f| {
+            //     self.exclude
+            //         .iter()
+            //         .all(|r| !r.is_match(f.to_str().unwrap()))
+            // });
+            let share = Arc::new(Share::new(
+                self.benchmark.clone(),
+                file,
+                self.timeout,
+                self.memory_limit,
+            ));
             let mut joins = Vec::new();
             for _ in 0..test_cores {
                 let worker = Worker::new(evaluatee.clone(), share.clone());

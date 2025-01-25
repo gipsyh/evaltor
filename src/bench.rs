@@ -1,8 +1,7 @@
+use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
 use std::{collections::HashSet, fs::read_dir, path::PathBuf};
 
-use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
-
-fn search_cases(path: &str, format: &str) -> Vec<PathBuf> {
+fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
     for entry in read_dir(path).unwrap() {
         let path = entry.unwrap().path();
@@ -13,7 +12,7 @@ fn search_cases(path: &str, format: &str) -> Vec<PathBuf> {
                 }
             }
         } else if path.is_dir() {
-            let sub_cases = search_cases(path.to_str().unwrap(), format);
+            let sub_cases = search_cases(&path, format);
             cases.extend(sub_cases);
         }
     }
@@ -27,9 +26,10 @@ pub enum Format {
     Btor,
 }
 
+#[derive(Clone, Debug)]
 pub struct Benchmark {
     name: String,
-    path: String,
+    path: PathBuf,
     format: String,
 }
 
@@ -37,7 +37,7 @@ impl Benchmark {
     pub fn new(name: &str, path: &str, format: &str) -> Self {
         Self {
             name: name.to_string(),
-            path: path.to_string(),
+            path: PathBuf::from(path),
             format: format.to_string(),
         }
     }
@@ -49,9 +49,13 @@ impl Benchmark {
     pub fn cases(&self) -> Vec<PathBuf> {
         search_cases(&self.path, &self.format)
     }
+
+    pub fn mount(&self) -> PathBuf {
+        self.path.clone()
+    }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct MultiBenchmark {
     name: Option<String>,
     benchs: Vec<Benchmark>,
@@ -93,5 +97,14 @@ impl MultiBenchmark {
         let mut rng = StdRng::seed_from_u64(0);
         res.shuffle(&mut rng);
         res
+    }
+
+    pub fn mount(&self) -> Vec<PathBuf> {
+        let benchs: HashSet<PathBuf> = self
+            .benchs
+            .iter()
+            .map(|b| b.mount().canonicalize().unwrap())
+            .collect();
+        benchs.into_iter().collect()
     }
 }
