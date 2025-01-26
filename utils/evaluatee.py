@@ -3,7 +3,7 @@ from typing import Dict, Optional, Union
 
 
 class Evaluatee:
-    TIMEOUT = 1000
+    TIMEOUT = 3600
 
     def __init__(self, file: os.PathLike, name: Optional[str] = None):
         self.name = (

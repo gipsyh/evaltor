@@ -37,3 +37,49 @@ impl Evaluatee for IC3 {
         command
     }
 }
+
+pub struct Portfolio;
+
+impl Evaluatee for Portfolio {
+    fn name(&self) -> String {
+        "avr-portfolio".to_string()
+    }
+
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let mut command = Command::new("python3");
+        command.current_dir("/root/rIC3-CAV25/avr");
+        let out = format!("/tmp/evaluator/{}", std::thread::current().id().as_u64());
+        command.args([
+            "/root/rIC3-CAV25/avr/avr_pr.py",
+            "--memout",
+            "133120",
+            "--timeout",
+            "10000",
+            "-o",
+            &out,
+        ]);
+        command.arg(std::fs::canonicalize(&path).unwrap());
+        command
+    }
+
+    fn parallelism(&self) -> usize {
+        16
+    }
+}
+
+pub struct Test;
+
+impl Evaluatee for Test {
+    fn name(&self) -> String {
+        "avr-portfolio".to_string()
+    }
+
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let command = Command::new("/root/bbb/target/release/bbb");
+        command
+    }
+
+    fn parallelism(&self) -> usize {
+        16
+    }
+}

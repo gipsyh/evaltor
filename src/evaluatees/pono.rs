@@ -26,13 +26,17 @@ impl Evaluatee for IC3ia {
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("pono");
-        command.args(["-e", "ic3ia", "-k", "100000000", "--pseudo-init-prop"]);
+        command.args(["-e", "ic3ia", "-k", "100000", "--pseudo-init-prop"]);
         command.arg(path);
         command
     }
 
     fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
         result_analyse(code, time, |c| matches!(c, 0 | 1))
+    }
+
+    fn parallelism(&self) -> usize {
+        2
     }
 }
 
