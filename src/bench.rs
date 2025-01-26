@@ -1,5 +1,9 @@
 use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
-use std::{collections::HashSet, fs::read_dir, path::PathBuf};
+use std::{
+    collections::HashSet,
+    fs::read_dir,
+    path::{Path, PathBuf},
+};
 
 fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
@@ -62,6 +66,7 @@ impl Benchmark {
 pub struct MultiBenchmark {
     name: Option<String>,
     benchs: Vec<Benchmark>,
+    filter: Option<HashSet<String>>,
 }
 
 impl MultiBenchmark {
@@ -82,6 +87,13 @@ impl MultiBenchmark {
         self
     }
 
+    pub fn set_filter<P: AsRef<Path>>(mut self, filter: P) -> Self {
+        let file = std::fs::File::open(filter).unwrap();
+        let filter: HashSet<String> = serde_json::from_reader(file).unwrap();
+        self.filter = Some(filter);
+        self
+    }
+
     pub fn add(mut self, b: Benchmark) -> Self {
         self.benchs.push(b);
         self
@@ -96,6 +108,9 @@ impl MultiBenchmark {
             if seen_filenames.insert(filename.to_owned()) {
                 res.push(case);
             }
+        }
+        if let Some(filter) = &self.filter {
+            res.retain(|f| filter.contains(&f.file_stem().unwrap().to_str().unwrap().to_string()));
         }
         let mut rng = StdRng::seed_from_u64(0);
         res.shuffle(&mut rng);

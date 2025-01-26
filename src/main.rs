@@ -20,7 +20,8 @@ fn main() {
         // .set_name("hwmcc192024")
         // .add(hwmcc19)
         // .add(hwmcc20)
-        .add(hwmcc24);
+        .add(hwmcc24)
+        .set_filter("./misc/avr_hwmcc24.json");
     Evaluation::new(bench)
         .set_timeout(Duration::from_secs(3600))
         .set_memory_limit(1024 * 1024 * 1024 * 128)
