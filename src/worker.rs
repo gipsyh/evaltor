@@ -1,5 +1,5 @@
 use crate::{bench::MultiBenchmark, evaluatees::EvaluationResult, Evaluatee};
-use bollard::{container, secret::HostConfig, Docker, API_DEFAULT_VERSION};
+use bollard::{container, secret::HostConfig, Docker};
 use bytes::Bytes;
 use futures::{StreamExt, TryStreamExt};
 use indicatif::ProgressBar;
@@ -100,12 +100,7 @@ pub struct Worker {
 
 impl Worker {
     pub fn new(evaluatee: Arc<dyn Evaluatee>, share: Arc<Share>) -> Self {
-        let docker = Docker::connect_with_unix(
-            "/Users/gipsyh/.docker/run/docker.sock",
-            120,
-            API_DEFAULT_VERSION,
-        )
-        .unwrap();
+        let docker = Docker::connect_with_local_defaults().unwrap();
         Self {
             evaluatee,
             share,
@@ -114,7 +109,6 @@ impl Worker {
     }
 
     async fn evaluate(&self, case: PathBuf, command: Command) {
-        let container_name = case.file_name().unwrap().to_str().unwrap();
         let binds = self
             .share
             .bench
@@ -130,24 +124,24 @@ impl Worker {
             binds: Some(binds),
             ..Default::default()
         };
+        let wdir = command
+            .get_current_dir()
+            .map(|d| d.as_os_str().to_str().unwrap())
+            .unwrap_or("/root");
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
-            image: Some("ubuntu:latest"),
-            working_dir: Some("/root"),
+            image: Some("evaluator:latest"),
+            working_dir: Some(wdir),
             cmd: Some(cmd),
+            tty: Some(true),
+            stop_signal: Some("SIGINT"),
             host_config: Some(host_config),
             ..Default::default()
         };
         let create = self
             .docker
-            .create_container(
-                Some(container::CreateContainerOptions {
-                    name: container_name,
-                    platform: None,
-                }),
-                config,
-            )
+            .create_container(None::<container::CreateContainerOptions<&str>>, config)
             .await
             .unwrap();
         self.docker
