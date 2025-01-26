@@ -114,13 +114,14 @@ impl Worker {
     }
 
     async fn evaluate(&self, case: PathBuf, command: Command) {
-        let container_name = "ubuntu";
+        let container_name = case.file_name().unwrap().to_str().unwrap();
         let binds = self
             .share
             .bench
             .mount()
             .iter()
             .chain(self.evaluatee.mount().iter())
+            .map(|m| m.canonicalize().unwrap())
             .map(|b| format!("{}:{}:ro", b.display(), b.display()))
             .collect();
         let host_config = HostConfig {
