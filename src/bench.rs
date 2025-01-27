@@ -62,11 +62,11 @@ impl Benchmark {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct MultiBenchmark {
     name: Option<String>,
     benchs: Vec<Benchmark>,
-    filter: Option<HashSet<String>>,
+    filter: Vec<Box<dyn BenchFilter>>,
 }
 
 impl MultiBenchmark {
@@ -87,10 +87,8 @@ impl MultiBenchmark {
         self
     }
 
-    pub fn set_filter<P: AsRef<Path>>(mut self, filter: P) -> Self {
-        let file = std::fs::File::open(filter).unwrap();
-        let filter: HashSet<String> = serde_json::from_reader(file).unwrap();
-        self.filter = Some(filter);
+    pub fn add_filter(mut self, filter: impl BenchFilter + 'static) -> Self {
+        self.filter.push(Box::new(filter));
         self
     }
 
@@ -109,8 +107,8 @@ impl MultiBenchmark {
                 res.push(case);
             }
         }
-        if let Some(filter) = &self.filter {
-            res.retain(|f| filter.contains(&f.file_stem().unwrap().to_str().unwrap().to_string()));
+        for f in self.filter.iter() {
+            res = f.filter(res);
         }
         let mut rng = StdRng::seed_from_u64(0);
         res.shuffle(&mut rng);
@@ -124,5 +122,58 @@ impl MultiBenchmark {
             .map(|b| b.mount().canonicalize().unwrap())
             .collect();
         benchs.into_iter().collect()
+    }
+}
+
+pub trait BenchFilter {
+    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf>;
+}
+
+pub struct BenchIncludeFilter {
+    f: HashSet<String>,
+}
+
+impl BenchIncludeFilter {
+    pub fn new<P: AsRef<Path>>(f: P) -> Self {
+        let file = std::fs::File::open(f).unwrap();
+        let f: HashSet<String> = serde_json::from_reader(file).unwrap();
+        Self { f }
+    }
+}
+
+impl BenchFilter for BenchIncludeFilter {
+    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
+        cases
+            .into_iter()
+            .filter(|f| {
+                self.f
+                    .contains(&f.file_stem().unwrap().to_str().unwrap().to_string())
+            })
+            .collect()
+    }
+}
+
+pub struct BenchExcludeFilter {
+    f: HashSet<String>,
+}
+
+impl BenchExcludeFilter {
+    pub fn new<P: AsRef<Path>>(f: P) -> Self {
+        let file = std::fs::File::open(f).unwrap();
+        let f: HashSet<String> = serde_json::from_reader(file).unwrap();
+        Self { f }
+    }
+}
+
+impl BenchFilter for BenchExcludeFilter {
+    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
+        cases
+            .into_iter()
+            .filter(|f| {
+                !self
+                    .f
+                    .contains(&f.file_stem().unwrap().to_str().unwrap().to_string())
+            })
+            .collect()
     }
 }

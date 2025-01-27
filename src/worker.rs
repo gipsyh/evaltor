@@ -22,14 +22,14 @@ struct RaceShare {
 
 pub struct Share {
     race: Mutex<RaceShare>,
-    bench: MultiBenchmark,
+    bench_mount: Vec<PathBuf>,
     timeout: Duration,
     memory_limit: usize,
 }
 
 impl Share {
     pub fn new(
-        bench: MultiBenchmark,
+        bench: &MultiBenchmark,
         file: String,
         timeout: Duration,
         memory_limit: usize,
@@ -54,7 +54,7 @@ impl Share {
                 log_file,
                 pb,
             }),
-            bench,
+            bench_mount: bench.mount(),
             timeout,
             memory_limit,
         }
@@ -111,8 +111,7 @@ impl Worker {
     async fn evaluate(&self, case: PathBuf, command: Command) {
         let binds = self
             .share
-            .bench
-            .mount()
+            .bench_mount
             .iter()
             .chain(self.evaluatee.mount().iter())
             .map(|m| m.canonicalize().unwrap())

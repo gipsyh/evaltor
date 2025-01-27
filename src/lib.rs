@@ -74,7 +74,7 @@ impl Evaluation {
             //         .all(|r| !r.is_match(f.to_str().unwrap()))
             // });
             let share = Arc::new(Share::new(
-                self.benchmark.clone(),
+                &self.benchmark,
                 file,
                 self.timeout,
                 self.memory_limit,

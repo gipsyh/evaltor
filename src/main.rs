@@ -1,5 +1,5 @@
 use evaluator::{
-    bench::{Benchmark, MultiBenchmark},
+    bench::{BenchIncludeFilter, Benchmark, MultiBenchmark},
     evaluatees, Evaluation,
 };
 use std::time::Duration;
@@ -20,7 +20,8 @@ fn main() {
         // .set_name("hwmcc192024")
         // .add(hwmcc19)
         // .add(hwmcc20)
-        .add(hwmcc24);
+        .add(hwmcc24)
+        .add_filter(BenchIncludeFilter::new("./misc/hwmcc24_solved.json"));
     Evaluation::new(bench)
         .set_timeout(Duration::from_secs(3600))
         .set_memory_limit(1024 * 1024 * 1024 * 128)
