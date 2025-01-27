@@ -1,7 +1,6 @@
+use super::{result_analyse, EvaluationResult};
 use crate::Evaluatee;
 use std::{path::PathBuf, process::Command};
-
-use super::{result_analyse, EvaluationResult};
 
 pub struct Avy;
 
@@ -24,6 +23,10 @@ impl Evaluatee for Pavy {
         "pavy".to_string()
     }
 
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/rIC3-CAV25/Pavy")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("python3");
         command.arg("/root/rIC3-CAV25/Pavy/scripts/pavy.py");
@@ -32,7 +35,7 @@ impl Evaluatee for Pavy {
     }
 
     fn parallelism(&self) -> usize {
-        16
+        10
     }
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {

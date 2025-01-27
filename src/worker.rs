@@ -158,7 +158,10 @@ impl Worker {
                 Ok(wait_result) => self
                     .evaluatee
                     .result_analyse(wait_result.status_code, start.elapsed()),
-                Err(_) => EvaluationResult::Failed,
+                Err(bollard::errors::Error::DockerContainerWaitError { error: _, code: c }) => {
+                    self.evaluatee.result_analyse(c, start.elapsed())
+                }
+                _ => EvaluationResult::Failed,
             },
             Err(_) => {
                 self.docker.stop_container(&create.id, None).await.unwrap();
