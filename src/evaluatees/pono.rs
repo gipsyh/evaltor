@@ -54,3 +54,35 @@ impl Evaluatee for IC3bits {
         result_analyse(code, time, |c| matches!(c, 0 | 1))
     }
 }
+
+pub struct Portfolio;
+
+impl Evaluatee for Portfolio {
+    fn name(&self) -> String {
+        "pono-portfolio".to_string()
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![
+            PathBuf::from("/root/rIC3-CAV25/pono"),
+            PathBuf::from("/usr/local/bin/pono"),
+        ]
+    }
+
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let mut command = Command::new("python3");
+        command.current_dir("/root/rIC3-CAV25/pono");
+        command.arg("./scripts/parallel_pono.py");
+        command.args(["-k", "1000000"]);
+        command.arg(path);
+        command
+    }
+
+    fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
+        result_analyse(code, time, |c| matches!(c, 0 | 1))
+    }
+
+    fn parallelism(&self) -> usize {
+        16
+    }
+}
