@@ -1,27 +1,20 @@
 import sys
+from evaluatee import Evaluatee
+
+def merge(evaluatee: list[Evaluatee]):
+    result = {}
+    for case in evaluatee[0].cases():
+        result[case] = [e[case] for e in evaluatee]
+    return result
 
 if __name__ == "__main__":
-    data = {}
+    evaluatee = []
     for file in sys.argv[1:]:
-        print(file)
-        with open(file, 'r') as f:
-            for line in f:
-                case, time = line.strip().split()
-                if case.endswith("aag"):
-                    case = case[:-4]
-                if case.endswith("aig"):
-                    case = case[:-4]
-                if case.endswith("btor2"):
-                    case = case[:-6]
-                case = case.split('/')[-1]
-                if case in data:
-                    data[case].append(time)
-                else:
-                    data[case] = [time]
+        evaluatee.append(Evaluatee(file))
+    merged = merge(evaluatee)
     with open("merge-result", 'w') as result:
-        keys = sorted(data.keys())
-        for key in keys:
-            if len(data[key]) == len(sys.argv[1:]):
-                output = f"{key} "
-                output += " ".join(str(element) for element in data[key])
-                result.write(output + '\n')
+        keys = sorted(merged.keys())
+        for case in merged:
+            output = f"{case} "
+            output += " ".join(str(time) if time is not None else "Timeout" for time in merged[case])
+            result.write(output + '\n')

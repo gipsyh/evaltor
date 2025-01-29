@@ -16,7 +16,7 @@ class Evaluatee:
             for line in file:
                 case, time = line.strip().split()
                 case = case.rsplit("/", 1)[-1]
-                case = case.rsplit(".", 1)[0] if "." in case else case
+                case = case.rsplit(".", 1)[0] if case.endswith((".aig", ".btor", ".btor2")) else case
                 if time == "Timeout":
                     self.timeout.add(case)
                 elif time == "Failed":

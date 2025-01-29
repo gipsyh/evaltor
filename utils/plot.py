@@ -40,7 +40,6 @@ def plot(evaluatee: list[Evaluatee]):
     plt.savefig("plot.png", dpi=1000)
 
 if __name__ == "__main__":
-    import sys
     evaluatee = []
     for file in sys.argv[1:]:
         evaluatee.append(Evaluatee(file))
