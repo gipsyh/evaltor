@@ -12,6 +12,10 @@ impl Evaluatee for Pdr {
         "nct".to_string()
     }
 
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/abc/build")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
         let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; pdr -nct");

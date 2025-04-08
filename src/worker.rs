@@ -130,7 +130,7 @@ impl Worker {
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
-            image: Some("evaluator:latest"),
+            image: Some("evaltor:latest"),
             working_dir: Some(wdir),
             cmd: Some(cmd),
             tty: Some(true),

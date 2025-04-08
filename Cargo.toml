@@ -1,5 +1,5 @@
 [package]
-name = "evaluator"
+name = "evaltor"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,7 @@ edition = "2021"
 bollard = "0.18.1"
 bytes = "1.9.0"
 chrono = "0.4.28"
+clap = { version = "4.5.35", features = ["derive"] }
 futures = "0.3.31"
 indicatif = "0.17.7"
 libc = "0.2.147"

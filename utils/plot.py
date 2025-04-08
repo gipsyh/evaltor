@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from evaluatee import Evaluatee
+import sys
 
 
 def plot_single(fg, e: Evaluatee, line=None):

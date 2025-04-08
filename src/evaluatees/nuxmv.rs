@@ -19,7 +19,7 @@ impl Evaluatee for IC3 {
             check_invar_ic3 -d -g
             quit"
         );
-        let file = format!("/tmp/evaluator/{}", thread::current().id().as_u64());
+        let file = format!("/tmp/evaltor/{}", thread::current().id().as_u64());
         let mut command = Command::new("sh");
         command
             .arg("-c")
@@ -71,7 +71,7 @@ impl Evaluatee for IC3ia {
             check_invar_ic3 -d -g
             quit"
         );
-        let file = format!("/tmp/evaluator/{}", thread::current().id().as_u64());
+        let file = format!("/tmp/evaltor/{}", thread::current().id().as_u64());
         let mut command = Command::new("sh");
         command
             .arg("-c")

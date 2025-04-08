@@ -10,16 +10,21 @@ impl Evaluatee for RIC3 {
     }
 
     fn version(&self) -> String {
-        "dynamic".to_string()
+        "dynamic-dev2".to_string()
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/rIC3")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
+        let mut command = Command::new("/root/rIC3/target/release/rIC3");
         command.arg(path);
         command.arg("-e");
         command.arg("ic3");
         command.arg("--ic3-ctg");
         command.arg("--ic3-dynamic");
+        command.arg("--ic3-inn");
         // command.arg("--ic3-no-dynamic");
         // command.arg("--ic3-ctg-limit");
         // command.arg("5");
@@ -66,11 +71,19 @@ impl Evaluatee for BMC {
         "rIC3bmc".to_string()
     }
 
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/rIC3")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
+        let mut command = Command::new("/root/rIC3/target/release/rIC3");
         command.args(&["-e", "bmc"]);
         command.arg(path);
         command
+    }
+
+    fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
+        result_analyse(code, time, |c| matches!(c, 10 | 20))
     }
 }
 
@@ -116,8 +129,12 @@ impl Evaluatee for Portfolio {
         "rIC3portfolio".to_string()
     }
 
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/rIC3")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
+        let mut command = Command::new("/root/rIC3/target/release/rIC3");
         command.arg("-e");
         command.arg("portfolio");
         // command.arg("--certify");
@@ -148,48 +165,6 @@ impl Evaluatee for IC3GipSAT {
     }
 }
 
-pub struct IC3Minisat;
-
-impl Evaluatee for IC3Minisat {
-    fn name(&self) -> String {
-        "rIC3-calcoi".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../fm24/FM2024/rIC3/target/release/rIC3");
-        command.arg(path);
-        command
-    }
-}
-
-pub struct IC3CaDiCal;
-
-impl Evaluatee for IC3CaDiCal {
-    fn name(&self) -> String {
-        "rIC3-cadical".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../fm24/FM2024/rIC3/target/release/rIC3");
-        command.arg(path);
-        command
-    }
-}
-
-pub struct IC3Cryptominisat;
-
-impl Evaluatee for IC3Cryptominisat {
-    fn name(&self) -> String {
-        "rIC3-cryptominisat".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../fm24/FM2024/rIC3/target/release/rIC3");
-        command.arg(path);
-        command
-    }
-}
-
 pub struct RIC3CAV25;
 
 impl Evaluatee for RIC3CAV25 {
@@ -198,25 +173,17 @@ impl Evaluatee for RIC3CAV25 {
     }
 
     fn version(&self) -> String {
-        "ctg".to_string()
+        "gipsat-dm".to_string()
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("/root/fm24/GipSAT-Artifact/rIC3")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("/root/rIC3-CAV25/rIC3/target/release/rIC3");
+        let mut command = Command::new("/root/fm24/GipSAT-Artifact/rIC3/target/release/rIC3");
         command.arg(path);
-        command.arg("-e");
-        command.arg("ic3");
-        command.arg("--ic3-ctg");
-        // command.arg("--ic3-dynamic");
-        // command.arg("--ic3-no-dynamic");
-        // command.arg("--ic3-ctg-limit");
-        // command.arg("5");
         // command.arg("--certify");
-        // command.arg("--ic3-inn");
         command
-    }
-
-    fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
-        result_analyse(code, time, |c| matches!(c, 10 | 20))
     }
 }

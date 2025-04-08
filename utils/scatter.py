@@ -19,9 +19,12 @@ def cal_ticks(max_val):
     loc.append(max_val)
     return loc, lab
 
+
 def scatter_single(fg, x: Evaluatee, y: Evaluatee):
     X = []
     Y = []
+    XG = []
+    YG = []
     num_x = 0
     num_y = 0
     speedup = []
@@ -30,20 +33,37 @@ def scatter_single(fg, x: Evaluatee, y: Evaluatee):
         if xt is None and yt is None:
             continue
         bsdp = xt is None or yt is None
+        if xt is None and yt is not None:
+            YG.append(case)
+        elif yt is None and xt is not None:
+            XG.append(case)
+        elif xt is not None and yt is not None:
+            if xt > yt * 5:
+                YG.append(case)
+            elif yt > xt * 5:
+                XG.append(case)
+
         xt = x.TIMEOUT if xt is None else max(xt, 0.1)
         yt = y.TIMEOUT if yt is None else max(yt, 0.1)
         X.append(xt)
         Y.append(yt)
+
         if xt <= 5 and yt <= 5:
             continue
         if not bsdp:
-            # if yt > xt:
-            #     print(f"{case} {yt} > {xt}")
             speedup.append(yt / xt)
         if xt < yt:
             num_x += 1
         elif xt > yt:
             num_y += 1
+
+    print("xgood:")
+    for case in XG:
+        print(case)
+    print()
+    print("ygood:")
+    for case in YG:
+        print(case)
 
     print(num_x, num_y)
     gm = gmean(speedup)
@@ -58,7 +78,7 @@ def scatter_single(fg, x: Evaluatee, y: Evaluatee):
     fg.set_xlim(0.1, x.TIMEOUT * 1.2)
     fg.set_ylim(0.1, y.TIMEOUT * 1.2)
     fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT], color="grey", linestyle="dashed")
-    fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT * gm], linestyle='dashed', color="#721454")
+    fg.plot([0, x.TIMEOUT], [0, y.TIMEOUT * gm], linestyle="dashed", color="#721454")
     loc, lab = cal_ticks(x.TIMEOUT)
     fg.set_xticks(loc, lab)
     fg.set_yticks(loc, lab)
@@ -76,8 +96,10 @@ def scatter(evaluatee: list[Evaluatee], plot_x=4):
     fig.show()
     fig.savefig("scatter.png", dpi=500)
 
+
 if __name__ == "__main__":
     import sys
+
     evaluatee = []
     for file in sys.argv[1:]:
         evaluatee.append(Evaluatee(file))

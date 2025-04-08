@@ -2,6 +2,7 @@
 
 pub mod bench;
 pub mod evaluatees;
+pub mod options;
 mod worker;
 
 use bench::MultiBenchmark;
