@@ -38,32 +38,6 @@ impl Evaluatee for RIC3 {
     }
 }
 
-pub struct PRIC3;
-
-impl Evaluatee for PRIC3 {
-    fn name(&self) -> String {
-        "PrIC3".to_string()
-    }
-
-    fn version(&self) -> String {
-        "t1".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.arg(path);
-        command.arg("-e");
-        command.arg("ic3");
-        command.arg("--ic3-parallelism");
-        command.arg("8");
-        command
-    }
-
-    fn parallelism(&self) -> usize {
-        8
-    }
-}
-
 pub struct BMC;
 
 impl Evaluatee for BMC {
@@ -84,21 +58,6 @@ impl Evaluatee for BMC {
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
         result_analyse(code, time, |c| matches!(c, 10 | 20))
-    }
-}
-
-pub struct Kind;
-
-impl Evaluatee for Kind {
-    fn name(&self) -> String {
-        "rIC3kind".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.arg("--kind");
-        command.arg(path);
-        command
     }
 }
 
@@ -148,42 +107,5 @@ impl Evaluatee for Portfolio {
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
         result_analyse(code, time, |c| matches!(c, 10 | 20))
-    }
-}
-
-pub struct IC3GipSAT;
-
-impl Evaluatee for IC3GipSAT {
-    fn name(&self) -> String {
-        "rIC3-gipsat".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../fm24/FM2024/rIC3/target/release/rIC3");
-        command.arg(path);
-        command
-    }
-}
-
-pub struct RIC3CAV25;
-
-impl Evaluatee for RIC3CAV25 {
-    fn name(&self) -> String {
-        "rIC3".to_string()
-    }
-
-    fn version(&self) -> String {
-        "gipsat-dm".to_string()
-    }
-
-    fn mount(&self) -> Vec<PathBuf> {
-        vec![PathBuf::from("/root/fm24/GipSAT-Artifact/rIC3")]
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("/root/fm24/GipSAT-Artifact/rIC3/target/release/rIC3");
-        command.arg(path);
-        // command.arg("--certify");
-        command
     }
 }

@@ -36,25 +36,6 @@ impl Evaluatee for IC3ia {
     }
 }
 
-pub struct IC3bits;
-
-impl Evaluatee for IC3bits {
-    fn name(&self) -> String {
-        "pono-ic3bits".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("pono");
-        command.args(["-e", "ic3bits", "-k", "100000000"]);
-        command.arg(path);
-        command
-    }
-
-    fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
-        result_analyse(code, time, |c| matches!(c, 0 | 1))
-    }
-}
-
 pub struct Portfolio;
 
 impl Evaluatee for Portfolio {

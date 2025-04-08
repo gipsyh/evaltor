@@ -41,38 +41,6 @@ impl Evaluatee for BMC {
     }
 }
 
-pub struct IMC;
-
-impl Evaluatee for IMC {
-    fn name(&self) -> String {
-        "abcimc".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
-        let path = format!("read {path}; logic; undc; strash; zero; int");
-        let mut command = Command::new("/usr/local/bin/abc");
-        command.arg("-c").arg(path);
-        command
-    }
-}
-
-pub struct KIND;
-
-impl Evaluatee for KIND {
-    fn name(&self) -> String {
-        "abckind".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
-        let path = format!("read {path}; logic; undc; strash; zero; ind");
-        let mut command = Command::new("/usr/local/bin/abc");
-        command.arg("-c").arg(path);
-        command
-    }
-}
-
 pub struct SuperProve;
 
 impl Evaluatee for SuperProve {
