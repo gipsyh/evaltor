@@ -14,7 +14,7 @@ use worker::{Share, Worker};
 
 pub struct Evaluation {
     benchmark: MultiBenchmark,
-    evaluatees: Vec<Arc<dyn Evaluatee>>,
+    pub evaluatees: Vec<Arc<dyn Evaluatee>>,
     timeout: Duration,
     memory_limit: usize,
     test_cores: usize,

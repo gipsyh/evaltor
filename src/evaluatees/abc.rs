@@ -25,22 +25,6 @@ impl Evaluatee for Pdr {
     }
 }
 
-pub struct BMC;
-
-impl Evaluatee for BMC {
-    fn name(&self) -> String {
-        "abcbmc".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
-        let path = format!("read {path}; logic; undc; strash; zero; bmc3");
-        let mut command = Command::new("/usr/local/bin/abc");
-        command.arg("-c").arg(path);
-        command
-    }
-}
-
 pub struct SuperProve;
 
 impl Evaluatee for SuperProve {

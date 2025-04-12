@@ -1,3 +1,4 @@
+use clap::ValueEnum;
 use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
 use std::{
     collections::HashSet,
@@ -28,7 +29,7 @@ fn search_cases(path: &PathBuf, format: Format) -> Vec<PathBuf> {
         .collect()
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum Format {
     Aig,
     Aag,
