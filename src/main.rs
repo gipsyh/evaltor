@@ -10,24 +10,24 @@ use std::{sync::Arc, time::Duration};
 fn main() {
     let options = Options::parse();
     let (suf, format) = match options.config {
-        Configuration::rIC3 => ("aig", Format::Aig),
-        Configuration::nuXmv => ("aig", Format::Aig),
-        Configuration::ABC_pdr => ("aig1.8", Format::Aig),
-        Configuration::Avy => ("aig1.8", Format::Aig),
-        Configuration::IC3ref => ("aig1.8", Format::Aig),
-        Configuration::AVR_ic3sa => ("bv", Format::Btor),
-        Configuration::Pono_ic3ia => ("bv", Format::Btor),
-        Configuration::Pono_ic3sa => ("bv", Format::Btor),
-        Configuration::rIC3_portfolio => ("aig", Format::Aig),
-        Configuration::ABC_superprove => ("aig", Format::Aig),
-        Configuration::Pavy => ("aig1.8", Format::Aig),
-        Configuration::AVR_portfolio => ("bv", Format::Btor),
-        Configuration::Pono_portfolio => ("bv", Format::Btor),
+        Configuration::ric3 => ("aig", Format::Aig),
+        Configuration::nuxmv => ("aig", Format::Aig),
+        Configuration::abc_pdr => ("aig1.8", Format::Aig),
+        Configuration::avy => ("aig1.8", Format::Aig),
+        Configuration::ic3ref => ("aig1.8", Format::Aig),
+        Configuration::avr_ic3sa => ("bv", Format::Btor),
+        Configuration::pono_ic3ia => ("bv", Format::Btor),
+        Configuration::pono_ic3sa => ("bv", Format::Btor),
+        Configuration::ric3_portfolio => ("aig", Format::Aig),
+        Configuration::abc_superprove => ("aig", Format::Aig),
+        Configuration::pavy => ("aig1.8", Format::Aig),
+        Configuration::avr_portfolio => ("bv", Format::Btor),
+        Configuration::pono_portfolio => ("bv", Format::Btor),
     };
 
-    let hwmcc19 = Benchmark::new("hwmcc19", &format!("../mc-benchmark/hwmcc19/{suf}"), format);
-    let hwmcc20 = Benchmark::new("hwmcc20", &format!("../mc-benchmark/hwmcc20/{suf}"), format);
-    let hwmcc24 = Benchmark::new("hwmcc24", &format!("../mc-benchmark/hwmcc24/{suf}"), format);
+    let hwmcc19 = Benchmark::new("hwmcc19", &format!("./benchmark/hwmcc19/{suf}"), format);
+    let hwmcc20 = Benchmark::new("hwmcc20", &format!("./benchmark/hwmcc20/{suf}"), format);
+    let hwmcc24 = Benchmark::new("hwmcc24", &format!("./benchmark/hwmcc24/{suf}"), format);
     let bench = match options.bench {
         HWMCCBench::HWMCC19 => MultiBenchmark::new().add(hwmcc19),
         HWMCCBench::HWMCC20 => MultiBenchmark::new().add(hwmcc20),
@@ -41,19 +41,19 @@ fn main() {
     };
 
     let config: Arc<dyn Evaluatee> = match options.config {
-        Configuration::rIC3 => Arc::new(evaluatees::ric3::RIC3),
-        Configuration::nuXmv => Arc::new(evaluatees::nuxmv::IGoodLemma),
-        Configuration::ABC_pdr => Arc::new(evaluatees::abc::Pdr),
-        Configuration::Avy => Arc::new(evaluatees::avy::Avy),
-        Configuration::IC3ref => Arc::new(evaluatees::ic3ref::Ic3Ref),
-        Configuration::AVR_ic3sa => Arc::new(evaluatees::avr::IC3),
-        Configuration::Pono_ic3ia => Arc::new(evaluatees::pono::IC3ia),
-        Configuration::Pono_ic3sa => Arc::new(evaluatees::pono::IC3sa),
-        Configuration::rIC3_portfolio => Arc::new(evaluatees::ric3::Portfolio),
-        Configuration::ABC_superprove => Arc::new(evaluatees::abc::SuperProve),
-        Configuration::Pavy => Arc::new(evaluatees::avy::Pavy),
-        Configuration::AVR_portfolio => Arc::new(evaluatees::avr::Portfolio),
-        Configuration::Pono_portfolio => Arc::new(evaluatees::pono::Portfolio),
+        Configuration::ric3 => Arc::new(evaluatees::ric3::RIC3),
+        Configuration::nuxmv => Arc::new(evaluatees::nuxmv::IGoodLemma),
+        Configuration::abc_pdr => Arc::new(evaluatees::abc::Pdr),
+        Configuration::avy => Arc::new(evaluatees::avy::Avy),
+        Configuration::ic3ref => Arc::new(evaluatees::ic3ref::Ic3Ref),
+        Configuration::avr_ic3sa => Arc::new(evaluatees::avr::IC3),
+        Configuration::pono_ic3ia => Arc::new(evaluatees::pono::IC3ia),
+        Configuration::pono_ic3sa => Arc::new(evaluatees::pono::IC3sa),
+        Configuration::ric3_portfolio => Arc::new(evaluatees::ric3::Portfolio),
+        Configuration::abc_superprove => Arc::new(evaluatees::abc::SuperProve),
+        Configuration::pavy => Arc::new(evaluatees::avy::Pavy),
+        Configuration::avr_portfolio => Arc::new(evaluatees::avr::Portfolio),
+        Configuration::pono_portfolio => Arc::new(evaluatees::pono::Portfolio),
     };
 
     let mut evaltor = Evaluation::new(bench)

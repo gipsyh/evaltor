@@ -14,11 +14,11 @@ impl Evaluatee for RIC3 {
     }
 
     fn mount(&self) -> Vec<PathBuf> {
-        vec![PathBuf::from("/root/rIC3")]
+        vec![PathBuf::from("./rIC3-CAV25/")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("/root/rIC3/target/release/rIC3");
+        let mut command = Command::new("./rIC3-CAV25/bin/rIC3");
         command.arg(path);
         command.arg("-e");
         command.arg("ic3");
@@ -36,15 +36,19 @@ pub struct Portfolio;
 
 impl Evaluatee for Portfolio {
     fn name(&self) -> String {
-        "rIC3portfolio".to_string()
+        "rIC3".to_string()
+    }
+
+    fn version(&self) -> String {
+        "portfolio".to_string()
     }
 
     fn mount(&self) -> Vec<PathBuf> {
-        vec![PathBuf::from("/root/rIC3")]
+        vec![PathBuf::from("./rIC3-CAV25/")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("/root/rIC3/target/release/rIC3");
+        let mut command = Command::new("./rIC3-CAV25/bin/rIC3");
         command.arg("-e");
         command.arg("portfolio");
         command.arg(path);

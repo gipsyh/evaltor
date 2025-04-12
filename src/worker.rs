@@ -123,10 +123,11 @@ impl Worker {
             binds: Some(binds),
             ..Default::default()
         };
+        let wdir = std::env::current_dir().unwrap();
         let wdir = command
             .get_current_dir()
             .map(|d| d.as_os_str().to_str().unwrap())
-            .unwrap_or("/root");
+            .unwrap_or(wdir.to_str().unwrap());
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {

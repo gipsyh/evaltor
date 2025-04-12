@@ -64,9 +64,9 @@ impl Evaluation {
             let file = format!(
                 "result/{}-{}-{}-{}",
                 evaluatee.name(),
+                evaluatee.version(),
                 self.benchmark.name(),
                 Local::now().format("%m%d%H%M"),
-                evaluatee.version(),
             );
             // let mut cases = self.benchmark.cases();
             // cases.retain(|f| {
