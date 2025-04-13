@@ -44,7 +44,7 @@ fn main() {
         Configuration::ric3 => Arc::new(evaluatees::ric3::RIC3),
         Configuration::nuxmv => Arc::new(evaluatees::nuxmv::IGoodLemma),
         Configuration::abc_pdr => Arc::new(evaluatees::abc::Pdr),
-        Configuration::avy => Arc::new(evaluatees::avy::Avy),
+        Configuration::avy => Arc::new(evaluatees::avy::Kavy),
         Configuration::ic3ref => Arc::new(evaluatees::ic3ref::Ic3Ref),
         Configuration::avr_ic3sa => Arc::new(evaluatees::avr::IC3),
         Configuration::pono_ic3ia => Arc::new(evaluatees::pono::IC3ia),

@@ -18,8 +18,8 @@ pub enum EvaluationResult {
 pub trait Evaluatee: Send + Sync {
     fn name(&self) -> String;
 
-    fn version(&self) -> String {
-        "v0".to_string()
+    fn version(&self) -> Option<String> {
+        None
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command;

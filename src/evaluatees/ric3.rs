@@ -9,8 +9,8 @@ impl Evaluatee for RIC3 {
         "rIC3".to_string()
     }
 
-    fn version(&self) -> String {
-        "ic3".to_string()
+    fn version(&self) -> Option<String> {
+        Some("ic3".to_string())
     }
 
     fn mount(&self) -> Vec<PathBuf> {
@@ -39,8 +39,8 @@ impl Evaluatee for Portfolio {
         "rIC3".to_string()
     }
 
-    fn version(&self) -> String {
-        "portfolio".to_string()
+    fn version(&self) -> Option<String> {
+        Some("portfolio".to_string())
     }
 
     fn mount(&self) -> Vec<PathBuf> {

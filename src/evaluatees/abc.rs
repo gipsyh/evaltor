@@ -5,21 +5,21 @@ pub struct Pdr;
 
 impl Evaluatee for Pdr {
     fn name(&self) -> String {
-        "abcpdr".to_string()
+        "abc".to_string()
     }
 
-    fn version(&self) -> String {
-        "nct".to_string()
+    fn version(&self) -> Option<String> {
+        Some("pdr".to_string())
     }
 
     fn mount(&self) -> Vec<PathBuf> {
-        vec![PathBuf::from("/root/abc/build")]
+        vec![PathBuf::from("./rIC3-CAV25/")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let path = path.as_path().to_str().unwrap();
         let path = format!("read {path}; logic; undc; strash; zero; pdr -nct");
-        let mut command = Command::new("../rIC3-CAV25/abc/build/abc");
+        let mut command = Command::new("./rIC3-CAV25/bin/abc");
         command.arg("-c").arg(path);
         command
     }
@@ -29,7 +29,11 @@ pub struct SuperProve;
 
 impl Evaluatee for SuperProve {
     fn name(&self) -> String {
-        "abcsp".to_string()
+        "abc".to_string()
+    }
+
+    fn version(&self) -> Option<String> {
+        Some("superprove".to_string())
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {

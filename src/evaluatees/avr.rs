@@ -8,6 +8,14 @@ impl Evaluatee for IC3 {
         "avr".to_string()
     }
 
+    fn version(&self) -> Option<String> {
+        Some("ic3sa".to_string())
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("./rIC3-CAV25/")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("python3");
         command.current_dir("/root/rIC3-CAV25/avr");
@@ -30,7 +38,11 @@ pub struct Portfolio;
 
 impl Evaluatee for Portfolio {
     fn name(&self) -> String {
-        "avr-portfolio".to_string()
+        "avr".to_string()
+    }
+
+    fn version(&self) -> Option<String> {
+        Some("portfolio".to_string())
     }
 
     fn mount(&self) -> Vec<PathBuf> {
