@@ -6,7 +6,6 @@ pub mod options;
 mod worker;
 
 use bench::MultiBenchmark;
-use chrono::Local;
 use evaluatees::Evaluatee;
 use regex::Regex;
 use std::{sync::Arc, thread::spawn, time::Duration};
@@ -64,19 +63,13 @@ impl Evaluation {
             let version = evaluatee.version();
             let file = if let Some(version) = version {
                 format!(
-                    "result/{}-{}-{}-{}",
+                    "result/{}-{}-{}",
                     evaluatee.name(),
                     version,
                     self.benchmark.name(),
-                    Local::now().format("%m%d%H%M"),
                 )
             } else {
-                format!(
-                    "result/{}-{}-{}",
-                    evaluatee.name(),
-                    self.benchmark.name(),
-                    Local::now().format("%m%d%H%M"),
-                )
+                format!("result/{}-{}", evaluatee.name(), self.benchmark.name(),)
             };
             // let mut cases = self.benchmark.cases();
             // cases.retain(|f| {

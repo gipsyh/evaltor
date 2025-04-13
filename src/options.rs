@@ -38,6 +38,10 @@ pub enum HWMCCBench {
 #[derive(Clone, Copy, ValueEnum, Debug)]
 pub enum Configuration {
     ric3,
+    ric3_ms,
+    ric3_ctg,
+    ric3_inn,
+    ric3_la,
     nuxmv,
     abc_pdr,
     avy,

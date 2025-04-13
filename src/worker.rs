@@ -6,6 +6,7 @@ use indicatif::ProgressBar;
 use std::{
     fs::File,
     io::{BufWriter, Write},
+    iter,
     path::{Path, PathBuf},
     process::Command,
     sync::{Arc, Mutex},
@@ -109,7 +110,7 @@ impl Worker {
     }
 
     async fn evaluate(&self, case: PathBuf, command: Command) {
-        let binds = self
+        let mut binds: Vec<String> = self
             .share
             .bench_mount
             .iter()
@@ -117,6 +118,13 @@ impl Worker {
             .map(|m| m.canonicalize().unwrap())
             .map(|b| format!("{}:{}:ro", b.display(), b.display()))
             .collect();
+        binds.push(format!(
+            "{}:/usr/local/bin",
+            Path::new("./rIC3-CAV25/bin")
+                .canonicalize()
+                .unwrap()
+                .display()
+        ));
         let host_config = HostConfig {
             memory: Some(self.share.memory_limit as i64),
             cpu_count: Some(self.evaluatee.parallelism() as i64),
@@ -126,13 +134,16 @@ impl Worker {
         let wdir = std::env::current_dir().unwrap();
         let wdir = command
             .get_current_dir()
-            .map(|d| d.as_os_str().to_str().unwrap())
-            .unwrap_or(wdir.to_str().unwrap());
+            .map(|d| {
+                let d = d.canonicalize().unwrap();
+                d
+            })
+            .unwrap_or(wdir);
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
             image: Some("evaltor:latest"),
-            working_dir: Some(wdir),
+            working_dir: Some(wdir.to_str().unwrap()),
             cmd: Some(cmd),
             tty: Some(true),
             stop_signal: Some("SIGINT"),
@@ -173,18 +184,28 @@ impl Worker {
             stderr: true,
             ..Default::default()
         });
-        let log = self
+        match self
             .docker
             .logs(&create.id, options)
             .try_collect::<Vec<_>>()
             .await
-            .unwrap();
-        let log = log.into_iter().into_iter().map(|l| l.into_bytes());
-        self.docker
-            .remove_container(&create.id, Default::default())
-            .await
-            .unwrap();
-        self.share.submit_result(case, res, log);
+        {
+            Ok(log) => {
+                let log = log.into_iter().into_iter().map(|l| l.into_bytes());
+                self.docker
+                    .remove_container(&create.id, Default::default())
+                    .await
+                    .unwrap();
+                self.share.submit_result(case, res, log);
+            }
+            Err(_) => {
+                self.docker
+                    .remove_container(&create.id, Default::default())
+                    .await
+                    .unwrap();
+                self.share.submit_result(case, res, iter::empty());
+            }
+        };
     }
 
     pub fn start(self) {

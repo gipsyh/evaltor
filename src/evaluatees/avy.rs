@@ -45,7 +45,7 @@ impl Evaluatee for Pavy {
     }
 
     fn parallelism(&self) -> usize {
-        10
+        16
     }
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {

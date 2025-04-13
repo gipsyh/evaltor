@@ -18,10 +18,10 @@ impl Evaluatee for IC3 {
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("python3");
-        command.current_dir("/root/rIC3-CAV25/avr");
+        command.current_dir("./rIC3-CAV25/avr");
         let out = format!("/tmp/evaltor/{}", std::thread::current().id().as_u64());
         command.args([
-            "/root/rIC3-CAV25/avr/avr.py",
+            "avr.py",
             "--memout",
             "30000",
             "--timeout",
@@ -46,14 +46,14 @@ impl Evaluatee for Portfolio {
     }
 
     fn mount(&self) -> Vec<PathBuf> {
-        vec![PathBuf::from("/root/rIC3-CAV25/avr")]
+        vec![PathBuf::from("./rIC3-CAV25/")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
         let mut command = Command::new("python3");
-        command.current_dir("/root/rIC3-CAV25/avr");
+        command.current_dir("./rIC3-CAV25/avr");
         command.args([
-            "/root/rIC3-CAV25/avr/avr_pr.py",
+            "avr_pr.py",
             "--memout",
             "133120",
             "--timeout",

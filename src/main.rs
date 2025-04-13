@@ -11,6 +11,10 @@ fn main() {
     let options = Options::parse();
     let (suf, format) = match options.config {
         Configuration::ric3 => ("aig", Format::Aig),
+        Configuration::ric3_ms => ("aig", Format::Aig),
+        Configuration::ric3_ctg => ("aig", Format::Aig),
+        Configuration::ric3_inn => ("aig", Format::Aig),
+        Configuration::ric3_la => ("aig", Format::Aig),
         Configuration::nuxmv => ("aig", Format::Aig),
         Configuration::abc_pdr => ("aig1.8", Format::Aig),
         Configuration::avy => ("aig1.8", Format::Aig),
@@ -41,7 +45,11 @@ fn main() {
     };
 
     let config: Arc<dyn Evaluatee> = match options.config {
-        Configuration::ric3 => Arc::new(evaluatees::ric3::RIC3),
+        Configuration::ric3 => Arc::new(evaluatees::ric3::IC3),
+        Configuration::ric3_ms => todo!(),
+        Configuration::ric3_ctg => Arc::new(evaluatees::ric3::IC3Ctg),
+        Configuration::ric3_inn => Arc::new(evaluatees::ric3::IC3Inn),
+        Configuration::ric3_la => Arc::new(evaluatees::ric3::IC3La),
         Configuration::nuxmv => Arc::new(evaluatees::nuxmv::IGoodLemma),
         Configuration::abc_pdr => Arc::new(evaluatees::abc::Pdr),
         Configuration::avy => Arc::new(evaluatees::avy::Kavy),
