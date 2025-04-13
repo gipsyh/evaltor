@@ -32,6 +32,36 @@ impl Evaluatee for IC3 {
     }
 }
 
+pub struct IC3ms;
+
+impl Evaluatee for IC3ms {
+    fn name(&self) -> String {
+        "rIC3".to_string()
+    }
+
+    fn version(&self) -> Option<String> {
+        Some("ic3-ms".to_string())
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("./rIC3-CAV25/")]
+    }
+
+    fn evaluate(&self, path: &PathBuf) -> Command {
+        let mut command = Command::new("./rIC3-CAV25/bin/rIC3-ms");
+        command.arg(path);
+        command.arg("-e");
+        command.arg("ic3");
+        command.arg("--ic3-ctg");
+        command.arg("--ic3-dynamic");
+        command
+    }
+
+    fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
+        result_analyse(code, time, |c| matches!(c, 10 | 20))
+    }
+}
+
 pub struct IC3Ctg;
 
 impl Evaluatee for IC3Ctg {

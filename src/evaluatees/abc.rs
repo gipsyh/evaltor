@@ -36,9 +36,12 @@ impl Evaluatee for SuperProve {
         Some("superprove".to_string())
     }
 
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("./rIC3-CAV25/")]
+    }
+
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command =
-            Command::new("/root/rIC3-CAV25/super-prove-build/build/super_prove/bin/super_prove.sh");
+        let mut command = Command::new("./rIC3-CAV25/bin/super_prove/bin/super_prove.sh");
         command.arg(path);
         command
     }

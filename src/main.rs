@@ -32,6 +32,7 @@ fn main() {
     let hwmcc19 = Benchmark::new("hwmcc19", &format!("./benchmark/hwmcc19/{suf}"), format);
     let hwmcc20 = Benchmark::new("hwmcc20", &format!("./benchmark/hwmcc20/{suf}"), format);
     let hwmcc24 = Benchmark::new("hwmcc24", &format!("./benchmark/hwmcc24/{suf}"), format);
+    let subset = Benchmark::new("subset", &format!("./benchmark/subset/{suf}"), format);
     let bench = match options.bench {
         HWMCCBench::HWMCC19 => MultiBenchmark::new().add(hwmcc19),
         HWMCCBench::HWMCC20 => MultiBenchmark::new().add(hwmcc20),
@@ -41,12 +42,12 @@ fn main() {
             .add(hwmcc19)
             .add(hwmcc20)
             .add(hwmcc24),
-        HWMCCBench::Subset => todo!(),
+        HWMCCBench::Subset => MultiBenchmark::new().add(subset),
     };
 
     let config: Arc<dyn Evaluatee> = match options.config {
         Configuration::ric3 => Arc::new(evaluatees::ric3::IC3),
-        Configuration::ric3_ms => todo!(),
+        Configuration::ric3_ms => Arc::new(evaluatees::ric3::IC3ms),
         Configuration::ric3_ctg => Arc::new(evaluatees::ric3::IC3Ctg),
         Configuration::ric3_inn => Arc::new(evaluatees::ric3::IC3Inn),
         Configuration::ric3_la => Arc::new(evaluatees::ric3::IC3La),
