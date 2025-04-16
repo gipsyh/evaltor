@@ -61,13 +61,22 @@ impl Evaluation {
     pub fn evaluate(self) {
         for evaluatee in self.evaluatees.iter() {
             let test_cores = self.test_cores / evaluatee.parallelism();
-            let file = format!(
-                "result/{}-{}-{}-{}",
-                evaluatee.name(),
-                self.benchmark.name(),
-                Local::now().format("%m%d%H%M"),
-                evaluatee.version(),
-            );
+            let file = if let Some(version) = evaluatee.version() {
+                format!(
+                    "result/{}-{}-{}-{}",
+                    evaluatee.name(),
+                    version,
+                    self.benchmark.name(),
+                    Local::now().format("%m%d%H%M"),
+                )
+            } else {
+                format!(
+                    "result/{}-{}-{}",
+                    evaluatee.name(),
+                    self.benchmark.name(),
+                    Local::now().format("%m%d%H%M"),
+                )
+            };
             // let mut cases = self.benchmark.cases();
             // cases.retain(|f| {
             //     self.exclude

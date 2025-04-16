@@ -121,17 +121,22 @@ impl Worker {
             memory: Some(self.share.memory_limit as i64),
             cpu_count: Some(self.evaluatee.parallelism() as i64),
             binds: Some(binds),
+            init: Some(true),
             ..Default::default()
         };
+        let wdir = std::env::current_dir().unwrap();
         let wdir = command
             .get_current_dir()
-            .map(|d| d.as_os_str().to_str().unwrap())
-            .unwrap_or("/root");
+            .map(|d| {
+                let d = d.canonicalize().unwrap();
+                d
+            })
+            .unwrap_or(wdir);
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
             image: Some("evaltor:latest"),
-            working_dir: Some(wdir),
+            working_dir: Some(wdir.to_str().unwrap()),
             cmd: Some(cmd),
             tty: Some(true),
             stop_signal: Some("SIGINT"),

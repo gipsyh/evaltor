@@ -9,8 +9,8 @@ impl Evaluatee for RIC3 {
         "rIC3".to_string()
     }
 
-    fn version(&self) -> String {
-        "dynamic-dev2".to_string()
+    fn version(&self) -> Option<String> {
+        Some("dynamic".to_string())
     }
 
     fn mount(&self) -> Vec<PathBuf> {
@@ -66,10 +66,6 @@ pub struct Deep;
 impl Evaluatee for Deep {
     fn name(&self) -> String {
         "rIC3Deep".to_string()
-    }
-
-    fn version(&self) -> String {
-        "v0".to_string()
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {

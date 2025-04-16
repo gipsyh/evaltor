@@ -5,13 +5,16 @@ pub struct Ic3Ref;
 
 impl Evaluatee for Ic3Ref {
     fn name(&self) -> String {
-        "ic3ref".to_string()
+        "IC3ref".to_string()
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![PathBuf::from("./IC3ref/")]
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../IC3ref/build/ic3refmain");
-        let file = std::fs::File::open(path).unwrap();
-        command.stdin(file);
+        let mut command = Command::new("./IC3ref/build/ic3refmain");
+        command.arg(path);
         command
     }
 }
