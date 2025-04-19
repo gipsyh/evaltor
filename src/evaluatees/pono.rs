@@ -1,6 +1,10 @@
 use super::{result_analyse, EvaluationResult};
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command, time::Duration};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    time::Duration,
+};
 
 pub struct IC3sa;
 
@@ -17,10 +21,10 @@ impl Evaluatee for IC3sa {
         vec![PathBuf::from("../pono")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("../pono/build/pono");
         command.args(["-e", "ic3sa", "-k", "100000000", "--static-coi"]);
-        command.arg(path);
+        command.arg(model);
         command
     }
 
@@ -44,10 +48,10 @@ impl Evaluatee for IC3ia {
         vec![PathBuf::from("../pono")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("../pono/build/pono");
         command.args(["-e", "ic3ia", "-k", "100000000", "--pseudo-init-prop"]);
-        command.arg(path);
+        command.arg(model);
         command
     }
 
@@ -71,12 +75,12 @@ impl Evaluatee for Portfolio {
         vec![PathBuf::from("../pono")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("python3");
         command.current_dir("../pono");
         command.arg("./scripts/parallel_pono.py");
         command.args(["-k", "1000000"]);
-        command.arg(path);
+        command.arg(model);
         command
     }
 

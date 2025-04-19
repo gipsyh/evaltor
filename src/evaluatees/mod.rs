@@ -1,4 +1,8 @@
-use std::{path::PathBuf, process::Command, time::Duration};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    time::Duration,
+};
 
 pub mod abc;
 pub mod avr;
@@ -22,7 +26,11 @@ pub trait Evaluatee: Send + Sync {
         None
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command;
+    fn evaluate(&self, model: &Path) -> Command;
+
+    fn evaluate_with_certify(&self, _model: &Path, _certificate: &Path) -> Command {
+        panic!("evaluation with certify is not supported")
+    }
 
     fn mount(&self) -> Vec<PathBuf> {
         vec![]
@@ -37,6 +45,10 @@ pub trait Evaluatee: Send + Sync {
 
     fn parallelism(&self) -> usize {
         1
+    }
+
+    fn certify(&self, _model: &Path, _certificate: &Path) -> bool {
+        true
     }
 }
 

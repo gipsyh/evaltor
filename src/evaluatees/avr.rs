@@ -1,5 +1,8 @@
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 pub struct IC3;
 
@@ -16,7 +19,7 @@ impl Evaluatee for IC3 {
         vec![PathBuf::from("./avr/")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("python3");
         command.current_dir("../avr");
         let out = format!("/tmp/evaltor/{}", std::thread::current().id().as_u64());
@@ -29,7 +32,7 @@ impl Evaluatee for IC3 {
             "-o",
             &out,
         ]);
-        command.arg(std::fs::canonicalize(&path).unwrap());
+        command.arg(std::fs::canonicalize(model).unwrap());
         command
     }
 }
@@ -49,7 +52,7 @@ impl Evaluatee for Portfolio {
         vec![PathBuf::from("../avr")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("python3");
         command.current_dir("../avr");
         command.args([
@@ -61,7 +64,7 @@ impl Evaluatee for Portfolio {
             "-o",
             "/root/avr_out/",
         ]);
-        command.arg(&path);
+        command.arg(model);
         command
     }
 

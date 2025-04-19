@@ -1,5 +1,8 @@
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 pub struct Ic3Ref;
 
@@ -12,9 +15,9 @@ impl Evaluatee for Ic3Ref {
         vec![PathBuf::from("./IC3ref/")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("./IC3ref/build/ic3refmain");
-        command.arg(path);
+        command.arg(model);
         command
     }
 }

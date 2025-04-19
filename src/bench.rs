@@ -12,7 +12,7 @@ fn search_cases(path: &PathBuf, format: Format) -> Vec<PathBuf> {
         let path = entry.unwrap().path();
         if path.is_file() {
             if let Some(extension) = path.extension() {
-                if extension.eq_ignore_ascii_case(&format!("{}", format)) {
+                if extension.eq_ignore_ascii_case(format!("{}", format)) {
                     cases.push(path);
                 }
             }
@@ -88,7 +88,7 @@ impl MultiBenchmark {
 
     pub fn name(&self) -> &str {
         if let Some(n) = &self.name {
-            &n
+            n
         } else {
             &self.benchs[0].name
         }
@@ -110,7 +110,7 @@ impl MultiBenchmark {
     }
 
     pub fn cases(&self) -> Vec<PathBuf> {
-        let cases: Vec<PathBuf> = self.benchs.iter().map(|b| b.cases()).flatten().collect();
+        let cases: Vec<PathBuf> = self.benchs.iter().flat_map(|b| b.cases()).collect();
         let mut seen_filenames = HashSet::new();
         let mut res = Vec::new();
         for case in cases {
@@ -157,10 +157,7 @@ impl BenchFilter for BenchIncludeFilter {
     fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
         cases
             .into_iter()
-            .filter(|f| {
-                self.f
-                    .contains(&f.file_stem().unwrap().to_str().unwrap().to_string())
-            })
+            .filter(|f| self.f.contains(f.file_stem().unwrap().to_str().unwrap()))
             .collect()
     }
 }
@@ -181,11 +178,7 @@ impl BenchFilter for BenchExcludeFilter {
     fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
         cases
             .into_iter()
-            .filter(|f| {
-                !self
-                    .f
-                    .contains(&f.file_stem().unwrap().to_str().unwrap().to_string())
-            })
+            .filter(|f| !self.f.contains(f.file_stem().unwrap().to_str().unwrap()))
             .collect()
     }
 }

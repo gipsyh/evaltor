@@ -1,6 +1,9 @@
 use super::{result_analyse, EvaluationResult};
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 pub struct RIC3;
 
@@ -17,9 +20,9 @@ impl Evaluatee for RIC3 {
         vec![PathBuf::from("/root/rIC3")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("/root/rIC3/target/release/rIC3");
-        command.arg(path);
+        command.arg(model);
         command.arg("-e");
         command.arg("ic3");
         command.arg("--ic3-ctg");
@@ -31,6 +34,38 @@ impl Evaluatee for RIC3 {
         // command.arg("--certify");
         // command.arg("--ic3-inn");
         command
+    }
+
+    fn evaluate_with_certify(&self, model: &Path, certificate: &Path) -> Command {
+        let mut cmd = self.evaluate(model);
+        cmd.arg(certificate);
+        cmd
+    }
+
+    fn certify(&self, model: &Path, certificate: &Path) -> bool {
+        let output = Command::new("docker")
+            .args([
+                "run",
+                "--rm",
+                "-v",
+                &format!("{}:{}", model.display(), model.display()),
+                "-v",
+                &format!("{}:{}", certificate.display(), certificate.display()),
+                "certifaiger",
+            ])
+            .arg(model)
+            .arg(certificate)
+            .output()
+            .unwrap();
+        if output.status.success() {
+            true
+        } else if let Some(1) = output.status.code() {
+            false
+        } else {
+            panic!(
+                    "certifaiger maybe not avaliable, please build docker image from https://github.com/Froleyks/certifaiger"
+                );
+        }
     }
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
@@ -49,31 +84,15 @@ impl Evaluatee for BMC {
         vec![PathBuf::from("/root/rIC3")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, path: &Path) -> Command {
         let mut command = Command::new("/root/rIC3/target/release/rIC3");
-        command.args(&["-e", "bmc"]);
+        command.args(["-e", "bmc"]);
         command.arg(path);
         command
     }
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
         result_analyse(code, time, |c| matches!(c, 10 | 20))
-    }
-}
-
-pub struct Deep;
-
-impl Evaluatee for Deep {
-    fn name(&self) -> String {
-        "rIC3Deep".to_string()
-    }
-
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("../rIC3/target/release/rIC3");
-        command.arg(path);
-        command.arg("-e");
-        command.arg("deep");
-        command
     }
 }
 
@@ -88,12 +107,11 @@ impl Evaluatee for Portfolio {
         vec![PathBuf::from("/root/rIC3")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("/root/rIC3/target/release/rIC3");
         command.arg("-e");
         command.arg("portfolio");
-        // command.arg("--certify");
-        command.arg(path);
+        command.arg(model);
         command
     }
 

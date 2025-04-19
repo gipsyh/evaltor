@@ -1,6 +1,9 @@
 use super::{result_analyse, EvaluationResult};
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 pub struct Kavy;
 
@@ -13,11 +16,11 @@ impl Evaluatee for Kavy {
         vec![PathBuf::from("../Pavy")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("python3");
         command.arg("../Pavy/scripts/pavy.py");
         command.args(["-p", "kavy3"]);
-        command.arg(path);
+        command.arg(model);
         command
     }
 
@@ -37,10 +40,10 @@ impl Evaluatee for Pavy {
         vec![PathBuf::from("../Pavy/")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("python3");
         command.arg("../Pavy/scripts/pavy.py");
-        command.arg(path);
+        command.arg(model);
         command
     }
 

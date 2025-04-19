@@ -1,7 +1,10 @@
-use crate::Evaluatee;
-use std::{path::PathBuf, process::Command, thread};
-
 use super::result_analyse;
+use crate::Evaluatee;
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    thread,
+};
 
 pub struct IC3;
 
@@ -10,8 +13,8 @@ impl Evaluatee for IC3 {
         "nuXmv".to_string()
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
+    fn evaluate(&self, path: &Path) -> Command {
+        let path = path.to_str().unwrap();
         let stdin = format!(
             "read_aiger_model -i {path}
             encode_variables
@@ -46,8 +49,8 @@ impl Evaluatee for IGoodLemma {
         vec![PathBuf::from("../i-Good_Lemmas_MC")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
+    fn evaluate(&self, path: &Path) -> Command {
+        let path = path.to_str().unwrap();
         let args =
             "-a ic3 -s cadical -m 1 -u 4 -I 1 -D 0 -g 1 -X 0 -c 0 -p 1 -d 2 -G 1 -P 1 -A 100 -O 3"
                 .split(' ');

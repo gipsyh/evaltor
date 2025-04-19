@@ -127,10 +127,7 @@ impl Worker {
         let wdir = std::env::current_dir().unwrap();
         let wdir = command
             .get_current_dir()
-            .map(|d| {
-                let d = d.canonicalize().unwrap();
-                d
-            })
+            .map(|d| d.canonicalize().unwrap())
             .unwrap_or(wdir);
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
@@ -183,7 +180,7 @@ impl Worker {
             .try_collect::<Vec<_>>()
             .await
             .unwrap();
-        let log = log.into_iter().into_iter().map(|l| l.into_bytes());
+        let log = log.into_iter().map(|l| l.into_bytes());
         self.docker
             .remove_container(&create.id, Default::default())
             .await

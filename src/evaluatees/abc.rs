@@ -1,5 +1,8 @@
 use crate::Evaluatee;
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 pub struct Pdr;
 
@@ -16,11 +19,11 @@ impl Evaluatee for Pdr {
         vec![PathBuf::from("../abc/build")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
-        let path = path.as_path().to_str().unwrap();
-        let path = format!("read {path}; logic; undc; strash; zero; pdr -nct");
+    fn evaluate(&self, model: &Path) -> Command {
+        let model = model.to_str().unwrap();
+        let model = format!("read {model}; logic; undc; strash; zero; pdr -nct");
         let mut command = Command::new("../abc/build/abc");
-        command.arg("-c").arg(path);
+        command.arg("-c").arg(model);
         command
     }
 }
@@ -40,9 +43,9 @@ impl Evaluatee for SuperProve {
         vec![PathBuf::from("../super-prove-build")]
     }
 
-    fn evaluate(&self, path: &PathBuf) -> Command {
+    fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("../super-prove-build/build/super_prove/bin/super_prove.sh");
-        command.arg(path);
+        command.arg(model);
         command
     }
 
