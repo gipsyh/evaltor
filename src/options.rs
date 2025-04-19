@@ -15,4 +15,8 @@ pub struct Options {
     /// memory limit
     #[arg(short, long, default_value_t = 16)]
     pub memout: usize,
+
+    /// certify
+    #[arg(short, long, default_value_t = false)]
+    pub certify: bool,
 }

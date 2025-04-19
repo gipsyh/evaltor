@@ -17,6 +17,7 @@ fn main() {
     Evaluation::new(bench)
         .set_timeout(Duration::from_secs(options.timeout))
         .set_memory_limit(1024 * 1024 * 1024 * options.memout)
+        .set_certify(options.certify)
         .add_evaluatee(evaluatees::abc::Pdr)
         .evaluate();
 }

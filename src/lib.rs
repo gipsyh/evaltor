@@ -18,6 +18,7 @@ pub struct Evaluation {
     timeout: Duration,
     memory_limit: usize,
     test_cores: usize,
+    certify: bool,
     exclude: Vec<Regex>,
 }
 
@@ -29,6 +30,7 @@ impl Evaluation {
             timeout: Duration::from_secs(1000),
             test_cores: num_cpus::get(),
             memory_limit: 1024 * 1024 * 1024,
+            certify: false,
             exclude: Vec::new(),
         }
     }
@@ -50,6 +52,11 @@ impl Evaluation {
 
     pub fn set_test_cores(mut self, test_cores: usize) -> Self {
         self.test_cores = test_cores;
+        self
+    }
+
+    pub fn set_certify(mut self, certify: bool) -> Self {
+        self.certify = certify;
         self
     }
 
@@ -88,6 +95,7 @@ impl Evaluation {
                 file,
                 self.timeout,
                 self.memory_limit,
+                self.certify,
             ));
             let mut joins = Vec::new();
             for _ in 0..test_cores {

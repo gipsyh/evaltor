@@ -25,6 +25,7 @@ pub struct Share {
     bench_mount: Vec<PathBuf>,
     timeout: Duration,
     memory_limit: usize,
+    certify: bool,
 }
 
 impl Share {
@@ -33,6 +34,7 @@ impl Share {
         file: String,
         timeout: Duration,
         memory_limit: usize,
+        certify: bool,
     ) -> Self {
         let cases = bench.cases();
         let result_file = format!("{}.txt", file);
@@ -57,6 +59,7 @@ impl Share {
             bench_mount: bench.mount(),
             timeout,
             memory_limit,
+            certify,
         }
     }
 
@@ -64,19 +67,14 @@ impl Share {
         self.race.lock().unwrap().cases.pop()
     }
 
-    fn submit_result(
-        &self,
-        case: PathBuf,
-        res: EvaluationResult,
-        log: impl Iterator<Item = Bytes>,
-    ) {
+    fn submit_result(&self, case: &Path, res: EvaluationResult, log: impl Iterator<Item = Bytes>) {
         let mut race = self.race.lock().unwrap();
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
         };
-        let out = format!("{} {}\n", case.as_path().to_str().unwrap(), out_time);
+        let out = format!("{} {}\n", case.display(), out_time);
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
         for l in log {
@@ -108,7 +106,7 @@ impl Worker {
         }
     }
 
-    async fn evaluate(&self, case: PathBuf, command: Command) {
+    async fn evaluate(&self, case: &Path, command: Command) {
         let binds = self
             .share
             .bench_mount
@@ -194,8 +192,20 @@ impl Worker {
             .build()
             .unwrap();
         while let Some(case) = self.share.get_case() {
-            let command = self.evaluatee.evaluate(&case);
-            rt.block_on(self.evaluate(case, command));
+            if self.share.certify {
+                let certificate = tempfile::NamedTempFile::new_in("/tmp/evaltor/").unwrap();
+                let certificate_path = certificate.path();
+                let command = self
+                    .evaluatee
+                    .evaluate_with_certify(&case, certificate_path);
+                rt.block_on(self.evaluate(case.as_path(), command));
+                if !self.evaluatee.certify(case.as_path(), certificate_path) {
+                    println!("certify {} failed", case.display());
+                }
+            } else {
+                let command = self.evaluatee.evaluate(&case);
+                rt.block_on(self.evaluate(case.as_path(), command));
+            }
         }
     }
 }
