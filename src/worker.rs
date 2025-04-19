@@ -67,12 +67,18 @@ impl Share {
         self.race.lock().unwrap().cases.pop()
     }
 
-    fn submit_result(&self, case: &Path, res: EvaluationResult, log: impl Iterator<Item = Bytes>) {
+    fn submit_result(
+        &self,
+        case: &Path,
+        res: EvaluationResult,
+        log: impl IntoIterator<Item = Bytes>,
+    ) {
         let mut race = self.race.lock().unwrap();
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
+            EvaluationResult::CertifyFailed => "CertifyFailed".to_string(),
         };
         let out = format!("{} {}\n", case.display(), out_time);
         race.res_file.write_all(out.as_bytes()).unwrap();
@@ -106,8 +112,12 @@ impl Worker {
         }
     }
 
-    async fn evaluate(&self, case: &Path, command: Command) {
-        let binds = self
+    async fn evaluate(
+        &self,
+        command: Command,
+        bind: Vec<PathBuf>,
+    ) -> (EvaluationResult, Vec<Bytes>) {
+        let mut binds: Vec<String> = self
             .share
             .bench_mount
             .iter()
@@ -115,6 +125,11 @@ impl Worker {
             .map(|m| m.canonicalize().unwrap())
             .map(|b| format!("{}:{}:ro", b.display(), b.display()))
             .collect();
+        binds.extend(
+            bind.iter()
+                .map(|m| m.canonicalize().unwrap())
+                .map(|b| format!("{}:{}", b.display(), b.display())),
+        );
         let host_config = HostConfig {
             memory: Some(self.share.memory_limit as i64),
             cpu_count: Some(self.evaluatee.parallelism() as i64),
@@ -130,7 +145,7 @@ impl Worker {
         let mut cmd = vec![command.get_program().to_str().unwrap()];
         cmd.extend(command.get_args().map(|a| a.to_str().unwrap()));
         let config = container::Config {
-            image: Some("evaltor:latest"),
+            image: Some("evaltor_box:latest"),
             working_dir: Some(wdir.to_str().unwrap()),
             cmd: Some(cmd),
             tty: Some(true),
@@ -183,7 +198,7 @@ impl Worker {
             .remove_container(&create.id, Default::default())
             .await
             .unwrap();
-        self.share.submit_result(case, res, log);
+        (res, log.collect())
     }
 
     pub fn start(self) {
@@ -198,13 +213,19 @@ impl Worker {
                 let command = self
                     .evaluatee
                     .evaluate_with_certify(&case, certificate_path);
-                rt.block_on(self.evaluate(case.as_path(), command));
-                if !self.evaluatee.certify(case.as_path(), certificate_path) {
-                    println!("certify {} failed", case.display());
+                let (mut res, log) =
+                    rt.block_on(self.evaluate(command, vec![PathBuf::from(certificate_path)]));
+                if let EvaluationResult::Success(_) = res {
+                    if !self.evaluatee.certify(case.as_path(), certificate_path) {
+                        println!("certify {} failed", case.display());
+                        res = EvaluationResult::CertifyFailed;
+                    }
                 }
+                self.share.submit_result(&case, res, log.into_iter());
             } else {
                 let command = self.evaluatee.evaluate(&case);
-                rt.block_on(self.evaluate(case.as_path(), command));
+                let (res, log) = rt.block_on(self.evaluate(command, vec![]));
+                self.share.submit_result(&case, res, log.into_iter());
             }
         }
     }

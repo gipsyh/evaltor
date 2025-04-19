@@ -17,6 +17,7 @@ pub enum EvaluationResult {
     Success(Duration),
     Timeout,
     Failed,
+    CertifyFailed,
 }
 
 pub trait Evaluatee: Send + Sync {
