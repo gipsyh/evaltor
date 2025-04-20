@@ -52,7 +52,7 @@ impl Evaluatee for IC3 {
                 &format!("{}:{}", model.display(), model.display()),
                 "-v",
                 &format!("{}:{}", certificate.display(), certificate.display()),
-                "certifaiger",
+                "ghcr.io/gipsyh/certifaiger",
             ])
             .arg(model)
             .arg(certificate)
