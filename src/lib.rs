@@ -90,13 +90,13 @@ impl Evaltor {
             //         .iter()
             //         .all(|r| !r.is_match(f.to_str().unwrap()))
             // });
-            let share = Arc::new(Share::new(
+            let share = Share::new(
                 &*self.benchmark,
                 file,
                 self.timeout,
                 self.memory_limit,
                 self.certify,
-            ));
+            );
             let mut joins = Vec::new();
             for _ in 0..num_worker {
                 let worker = Worker::new(evaluatee.clone(), share.clone());

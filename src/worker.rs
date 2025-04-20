@@ -1,6 +1,7 @@
 use crate::{bench::BenchIF, evaluatees::EvaluationResult, Evaluatee};
 use bollard::{container, secret::HostConfig, Docker};
 use bytes::Bytes;
+use crossbeam::queue::SegQueue;
 use futures::{StreamExt, TryStreamExt};
 use indicatif::ProgressBar;
 use std::{
@@ -14,14 +15,21 @@ use std::{
 use tokio::time::timeout;
 
 struct RaceShare {
-    cases: Vec<PathBuf>,
     res_file: File,
     log_file: BufWriter<File>,
     pb: ProgressBar,
 }
 
+impl Drop for RaceShare {
+    fn drop(&mut self) {
+        self.pb.finish();
+    }
+}
+
+#[derive(Clone)]
 pub struct Share {
-    race: Mutex<RaceShare>,
+    race_get: Arc<SegQueue<PathBuf>>,
+    race_put: Arc<Mutex<RaceShare>>,
     bench_mount: Vec<PathBuf>,
     timeout: Duration,
     memory_limit: usize,
@@ -36,7 +44,10 @@ impl Share {
         memory_limit: usize,
         certify: bool,
     ) -> Self {
-        let cases = bench.cases();
+        let cases = SegQueue::new();
+        for b in bench.cases() {
+            cases.push(b);
+        }
         let result_file = format!("{}.txt", file);
         let log_file = format!("{}.log", file);
         let res_file = File::create(Path::new(&result_file)).unwrap();
@@ -50,12 +61,12 @@ impl Share {
             .progress_chars("#>-"),
         );
         Self {
-            race: Mutex::new(RaceShare {
-                cases,
+            race_get: Arc::new(cases),
+            race_put: Arc::new(Mutex::new(RaceShare {
                 res_file,
                 log_file,
                 pb,
-            }),
+            })),
             bench_mount: bench.mount(),
             timeout,
             memory_limit,
@@ -63,17 +74,12 @@ impl Share {
         }
     }
 
+    #[inline]
     fn get_case(&self) -> Option<PathBuf> {
-        self.race.lock().unwrap().cases.pop()
+        self.race_get.pop()
     }
 
-    fn submit_result(
-        &self,
-        case: &Path,
-        res: EvaluationResult,
-        log: impl IntoIterator<Item = Bytes>,
-    ) {
-        let mut race = self.race.lock().unwrap();
+    fn submit_result(&self, case: &Path, res: EvaluationResult, log: Vec<Bytes>) {
         let out_time = match res {
             EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
             EvaluationResult::Timeout => "Timeout".to_string(),
@@ -81,29 +87,26 @@ impl Share {
             EvaluationResult::CertifyFailed => "CertifyFailed".to_string(),
         };
         let out = format!("{} {}\n", case.display(), out_time);
+        let mut race = self.race_put.lock().unwrap();
         race.res_file.write_all(out.as_bytes()).unwrap();
         race.pb.inc(1);
-        for l in log {
-            race.log_file.write_all(&l).unwrap();
+        if !log.is_empty() {
+            for l in log {
+                race.log_file.write_all(&l).unwrap();
+            }
+            race.log_file.flush().unwrap();
         }
-        race.log_file.flush().unwrap();
-    }
-}
-
-impl Drop for Share {
-    fn drop(&mut self) {
-        self.race.lock().unwrap().pb.finish();
     }
 }
 
 pub struct Worker {
     evaluatee: Arc<dyn Evaluatee>,
-    share: Arc<Share>,
+    share: Share,
     docker: Docker,
 }
 
 impl Worker {
-    pub fn new(evaluatee: Arc<dyn Evaluatee>, share: Arc<Share>) -> Self {
+    pub fn new(evaluatee: Arc<dyn Evaluatee>, share: Share) -> Self {
         let docker = Docker::connect_with_local_defaults().unwrap();
         Self {
             evaluatee,
@@ -221,11 +224,11 @@ impl Worker {
                         res = EvaluationResult::CertifyFailed;
                     }
                 }
-                self.share.submit_result(&case, res, log.into_iter());
+                self.share.submit_result(&case, res, log);
             } else {
                 let command = self.evaluatee.evaluate(&case);
                 let (res, log) = rt.block_on(self.evaluate(command, vec![]));
-                self.share.submit_result(&case, res, log.into_iter());
+                self.share.submit_result(&case, res, log);
             }
         }
     }

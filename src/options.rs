@@ -26,6 +26,10 @@ pub struct Options {
     /// number of workers
     #[arg(short = 'w', long)]
     pub num_worker: Option<usize>,
+
+    /// number of fuzz tests
+    #[arg(short = 'f', long, default_value_t = 1000)]
+    pub num_fuzz: usize,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]

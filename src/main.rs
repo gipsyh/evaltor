@@ -43,7 +43,7 @@ fn main() {
                 .add(hwmcc20)
                 .add(hwmcc24),
         ),
-        evaltor::options::Bench::Fuzz => Box::new(FuzzBench::new(10000)),
+        evaltor::options::Bench::Fuzz => Box::new(FuzzBench::new(options.num_fuzz)),
     };
     let mut evaltor = Evaltor::new(bench)
         .set_timeout(Duration::from_secs(options.timeout))
