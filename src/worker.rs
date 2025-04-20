@@ -1,4 +1,4 @@
-use crate::{bench::MultiBenchmark, evaluatees::EvaluationResult, Evaluatee};
+use crate::{bench::BenchIF, evaluatees::EvaluationResult, Evaluatee};
 use bollard::{container, secret::HostConfig, Docker};
 use bytes::Bytes;
 use futures::{StreamExt, TryStreamExt};
@@ -30,7 +30,7 @@ pub struct Share {
 
 impl Share {
     pub fn new(
-        bench: &MultiBenchmark,
+        bench: &dyn BenchIF,
         file: String,
         timeout: Duration,
         memory_limit: usize,

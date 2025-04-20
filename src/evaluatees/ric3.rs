@@ -26,6 +26,7 @@ impl Evaluatee for IC3 {
         command.arg("ic3");
         command.arg("--ic3-ctg");
         command.arg("--ic3-dynamic");
+        command.arg("-v0");
         // command.arg("--ic3-inn");
         // command.arg("--ic3-no-dynamic");
         // command.arg("--ic3-ctg-limit");

@@ -1,10 +1,9 @@
+pub mod filter;
+pub mod fuzz;
+
+use filter::BenchFilter;
 use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
-use std::{
-    collections::HashSet,
-    fmt::Display,
-    fs::read_dir,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, fmt::Display, fs::read_dir, path::PathBuf};
 
 fn search_cases(path: &PathBuf, format: Format) -> Vec<PathBuf> {
     let mut cases = Vec::new();
@@ -45,6 +44,14 @@ impl Display for Format {
     }
 }
 
+pub trait BenchIF {
+    fn name(&self) -> &str;
+
+    fn cases(&self) -> Vec<PathBuf>;
+
+    fn mount(&self) -> Vec<PathBuf>;
+}
+
 #[derive(Clone, Debug)]
 pub struct Benchmark {
     name: String,
@@ -60,38 +67,32 @@ impl Benchmark {
             format,
         }
     }
+}
 
-    pub fn name(&self) -> &str {
+impl BenchIF for Benchmark {
+    fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn cases(&self) -> Vec<PathBuf> {
+    fn cases(&self) -> Vec<PathBuf> {
         search_cases(&self.path, self.format)
     }
 
-    pub fn mount(&self) -> PathBuf {
-        self.path.clone()
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![self.path.clone()]
     }
 }
 
 #[derive(Default)]
 pub struct MultiBenchmark {
     name: Option<String>,
-    benchs: Vec<Benchmark>,
+    benchs: Vec<Box<dyn BenchIF>>,
     filter: Vec<Box<dyn BenchFilter>>,
 }
 
 impl MultiBenchmark {
     pub fn new() -> Self {
         Self::default()
-    }
-
-    pub fn name(&self) -> &str {
-        if let Some(n) = &self.name {
-            n
-        } else {
-            &self.benchs[0].name
-        }
     }
 
     pub fn set_name(mut self, name: &str) -> Self {
@@ -104,12 +105,22 @@ impl MultiBenchmark {
         self
     }
 
-    pub fn add(mut self, b: Benchmark) -> Self {
+    pub fn add(mut self, b: Box<dyn BenchIF>) -> Self {
         self.benchs.push(b);
         self
     }
+}
 
-    pub fn cases(&self) -> Vec<PathBuf> {
+impl BenchIF for MultiBenchmark {
+    fn name(&self) -> &str {
+        if let Some(n) = &self.name {
+            n
+        } else {
+            self.benchs[0].name()
+        }
+    }
+
+    fn cases(&self) -> Vec<PathBuf> {
         let cases: Vec<PathBuf> = self.benchs.iter().flat_map(|b| b.cases()).collect();
         let mut seen_filenames = HashSet::new();
         let mut res = Vec::new();
@@ -127,58 +138,13 @@ impl MultiBenchmark {
         res
     }
 
-    pub fn mount(&self) -> Vec<PathBuf> {
+    fn mount(&self) -> Vec<PathBuf> {
         let benchs: HashSet<PathBuf> = self
             .benchs
             .iter()
-            .map(|b| b.mount().canonicalize().unwrap())
+            .flat_map(|b| b.mount())
+            .map(|b| b.canonicalize().unwrap())
             .collect();
         benchs.into_iter().collect()
-    }
-}
-
-pub trait BenchFilter {
-    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf>;
-}
-
-pub struct BenchIncludeFilter {
-    f: HashSet<String>,
-}
-
-impl BenchIncludeFilter {
-    pub fn new<P: AsRef<Path>>(f: P) -> Self {
-        let file = std::fs::File::open(f).unwrap();
-        let f: HashSet<String> = serde_json::from_reader(file).unwrap();
-        Self { f }
-    }
-}
-
-impl BenchFilter for BenchIncludeFilter {
-    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
-        cases
-            .into_iter()
-            .filter(|f| self.f.contains(f.file_stem().unwrap().to_str().unwrap()))
-            .collect()
-    }
-}
-
-pub struct BenchExcludeFilter {
-    f: HashSet<String>,
-}
-
-impl BenchExcludeFilter {
-    pub fn new<P: AsRef<Path>>(f: P) -> Self {
-        let file = std::fs::File::open(f).unwrap();
-        let f: HashSet<String> = serde_json::from_reader(file).unwrap();
-        Self { f }
-    }
-}
-
-impl BenchFilter for BenchExcludeFilter {
-    fn filter(&self, cases: Vec<PathBuf>) -> Vec<PathBuf> {
-        cases
-            .into_iter()
-            .filter(|f| !self.f.contains(f.file_stem().unwrap().to_str().unwrap()))
-            .collect()
     }
 }

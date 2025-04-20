@@ -5,30 +5,30 @@ pub mod evaluatees;
 pub mod options;
 mod worker;
 
-use bench::MultiBenchmark;
+use bench::BenchIF;
 use chrono::Local;
 use evaluatees::Evaluatee;
 use regex::Regex;
 use std::{sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
 
-pub struct Evaluation {
-    benchmark: MultiBenchmark,
+pub struct Evaltor {
+    benchmark: Box<dyn BenchIF>,
     evaluatees: Vec<Arc<dyn Evaluatee>>,
     timeout: Duration,
     memory_limit: usize,
-    test_cores: usize,
+    num_worker: usize,
     certify: bool,
     exclude: Vec<Regex>,
 }
 
-impl Evaluation {
-    pub fn new(benchmark: MultiBenchmark) -> Self {
+impl Evaltor {
+    pub fn new(benchmark: Box<dyn BenchIF>) -> Self {
         Self {
             benchmark,
             evaluatees: Vec::new(),
             timeout: Duration::from_secs(1000),
-            test_cores: num_cpus::get(),
+            num_worker: num_cpus::get(),
             memory_limit: 1024 * 1024 * 1024,
             certify: false,
             exclude: Vec::new(),
@@ -50,8 +50,8 @@ impl Evaluation {
         self
     }
 
-    pub fn set_test_cores(mut self, test_cores: usize) -> Self {
-        self.test_cores = test_cores;
+    pub fn set_num_worker(mut self, num_worker: usize) -> Self {
+        self.num_worker = num_worker;
         self
     }
 
@@ -67,7 +67,7 @@ impl Evaluation {
 
     pub fn evaluate(self) {
         for evaluatee in self.evaluatees.iter() {
-            let test_cores = self.test_cores / evaluatee.parallelism();
+            let num_worker = self.num_worker / evaluatee.parallelism();
             let file = if let Some(version) = evaluatee.version() {
                 format!(
                     "result/{}-{}-{}-{}",
@@ -91,14 +91,14 @@ impl Evaluation {
             //         .all(|r| !r.is_match(f.to_str().unwrap()))
             // });
             let share = Arc::new(Share::new(
-                &self.benchmark,
+                &*self.benchmark,
                 file,
                 self.timeout,
                 self.memory_limit,
                 self.certify,
             ));
             let mut joins = Vec::new();
-            for _ in 0..test_cores {
+            for _ in 0..num_worker {
                 let worker = Worker::new(evaluatee.clone(), share.clone());
                 joins.push(spawn(|| worker.start()));
             }
