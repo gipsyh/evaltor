@@ -41,8 +41,13 @@ impl Evaluatee for SuperProve {
     }
 
     fn evaluate(&self, path: &PathBuf) -> Command {
-        let mut command = Command::new("./rIC3-CAV25/bin/super_prove/bin/super_prove.sh");
-        command.arg(path);
+        let conda_prefix = "/usr/local/miniconda3/envs/py2";
+        let full_cmd = format!("LD_LIBRARY_PATH={0}/lib:$LD_LIBRARY_PATH PYTHONHOME={0} PYTHONPATH={0}/lib/python2.7/site-packages ./rIC3-CAV25/bin/super_prove/bin/super_prove.sh {1}",
+            conda_prefix, path.display()
+        );
+        let mut command = Command::new("sh");
+        command.arg("-c");
+        command.arg(full_cmd);
         command
     }
 
