@@ -1,0 +1,11 @@
+[hwmcc17_live]
+aig = "/root/mc-benchmark/hwmcc17/liveness"
+
+[hwmcc19]
+aig = "/root/mc-benchmark/hwmcc19/aig"
+
+[hwmcc20]
+aig = "/root/mc-benchmark/hwmcc20/aig"
+
+[hwmcc24]
+aig = "/root/mc-benchmark/hwmcc24/aig"

@@ -1,4 +1,5 @@
 use clap::{Parser, ValueEnum};
+use std::path::PathBuf;
 
 /// Evaltor
 #[derive(Parser, Debug, Clone)]
@@ -8,8 +9,15 @@ use clap::{Parser, ValueEnum};
     after_help = "Copyright (C) 2023 - Present, Yuheng Su <gipsyh.icu@gmail.com>. All rights reserved."
 )]
 pub struct Options {
-    #[arg(short, long, value_enum, default_value_t = Bench::Hwmcc2024)]
-    pub bench: Bench,
+    /// benchmark configuration file in toml format
+    pub bench_config: PathBuf,
+
+    /// benchmark
+    #[arg(short, long, value_delimiter = ',', required = true)]
+    pub bench: Vec<String>,
+
+    /// engine configuration file in toml format
+    pub engine_config: PathBuf,
 
     /// time limit
     #[arg(short, long, default_value_t = 3600)]

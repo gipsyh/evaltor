@@ -3,15 +3,15 @@ pub mod fuzz;
 
 use filter::BenchFilter;
 use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
-use std::{collections::HashSet, fmt::Display, fs::read_dir, path::PathBuf};
+use std::{collections::HashSet, fs::read_dir, path::PathBuf};
 
-fn search_cases(path: &PathBuf, format: Format) -> Vec<PathBuf> {
+fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
     for entry in read_dir(path).unwrap() {
         let path = entry.unwrap().path();
         if path.is_file() {
             if let Some(extension) = path.extension() {
-                if extension.eq_ignore_ascii_case(format!("{}", format)) {
+                if extension.eq_ignore_ascii_case(format) {
                     cases.push(path);
                 }
             }
@@ -27,23 +27,6 @@ fn search_cases(path: &PathBuf, format: Format) -> Vec<PathBuf> {
         .collect()
 }
 
-#[derive(Clone, Copy, Debug)]
-pub enum Format {
-    Aig,
-    Aag,
-    Btor,
-}
-
-impl Display for Format {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Format::Aig => write!(f, "aig"),
-            Format::Aag => write!(f, "aag"),
-            Format::Btor => write!(f, "btor"),
-        }
-    }
-}
-
 pub trait BenchIF {
     fn name(&self) -> &str;
 
@@ -56,15 +39,15 @@ pub trait BenchIF {
 pub struct Benchmark {
     name: String,
     path: PathBuf,
-    format: Format,
+    format: String,
 }
 
 impl Benchmark {
-    pub fn new(name: &str, path: &str, format: Format) -> Self {
+    pub fn new(name: &str, path: &PathBuf, format: &str) -> Self {
         Self {
             name: name.to_string(),
-            path: PathBuf::from(path),
-            format,
+            path: path.clone(),
+            format: format.to_string(),
         }
     }
 }
@@ -75,7 +58,7 @@ impl BenchIF for Benchmark {
     }
 
     fn cases(&self) -> Vec<PathBuf> {
-        search_cases(&self.path, self.format)
+        search_cases(&self.path, &self.format)
     }
 
     fn mount(&self) -> Vec<PathBuf> {
