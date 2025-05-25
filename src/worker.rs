@@ -85,7 +85,9 @@ impl Share {
 
     fn submit_result(&self, case: &Path, res: EvaluationResult, log: Vec<Bytes>) {
         let out_time = match res {
-            EvaluationResult::Success(time) => format!("{:.2}", time.as_secs_f32()).to_string(),
+            EvaluationResult::Success(r, time) => {
+                format!("{r}({:.2})", time.as_secs_f32()).to_string()
+            }
             EvaluationResult::Timeout => "Timeout".to_string(),
             EvaluationResult::Failed => "Failed".to_string(),
             EvaluationResult::CertifyFailed => "CertifyFailed".to_string(),
@@ -222,7 +224,7 @@ impl Worker {
                     .evaluate_with_certify(&case, certificate_path);
                 let (mut res, log) =
                     rt.block_on(self.evaluate(command, vec![PathBuf::from(certificate_path)]));
-                if let EvaluationResult::Success(_) = res {
+                if let EvaluationResult::Success(..) = res {
                     if !self.evaluatee.certify(case.as_path(), certificate_path) {
                         println!("certify {} failed", case.display());
                         res = EvaluationResult::CertifyFailed;

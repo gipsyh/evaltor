@@ -1,19 +1,20 @@
 use std::{
+    collections::HashMap,
     path::{Path, PathBuf},
     process::Command,
     time::Duration,
 };
 
-pub mod abc;
-pub mod avr;
-pub mod avy;
-pub mod ic3ref;
-pub mod pono;
-pub mod ric3;
+// pub mod abc;
+// pub mod avr;
+// pub mod avy;
+// pub mod ic3ref;
+// pub mod pono;
+// pub mod ric3;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum EvaluationResult {
-    Success(Duration),
+    Success(String, Duration),
     Timeout,
     Failed,
     CertifyFailed,
@@ -22,8 +23,8 @@ pub enum EvaluationResult {
 pub trait EvaluateeIF: Send + Sync {
     fn name(&self) -> String;
 
-    fn version(&self) -> Option<String> {
-        None
+    fn version(&self) -> String {
+        "".to_string()
     }
 
     fn evaluate(&self, model: &Path) -> Command;
@@ -38,7 +39,7 @@ pub trait EvaluateeIF: Send + Sync {
 
     fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
         match code {
-            0 => EvaluationResult::Success(time),
+            0 => EvaluationResult::Success("Success".to_string(), time),
             _ => EvaluationResult::Failed,
         }
     }
@@ -52,29 +53,22 @@ pub trait EvaluateeIF: Send + Sync {
     }
 }
 
-fn result_analyse<F>(code: i64, time: Duration, success: F) -> EvaluationResult
-where
-    F: Fn(i64) -> bool,
-{
-    if success(code) {
-        EvaluationResult::Success(time)
-    } else {
-        EvaluationResult::Failed
-    }
-}
-
 pub struct Evaluatee {
     pub name: String,
+    pub version: String,
     pub cmd: PathBuf,
     pub args: Vec<String>,
+    pub exit_code: HashMap<i64, String>,
 }
 
 impl Evaluatee {
     pub fn new(name: &str, cmd: &PathBuf, args: &[String]) -> Self {
         Self {
             name: name.to_string(),
+            version: "".to_string(),
             cmd: cmd.clone(),
             args: args.to_vec(),
+            exit_code: Default::default(),
         }
     }
 }
@@ -82,6 +76,10 @@ impl Evaluatee {
 impl EvaluateeIF for Evaluatee {
     fn name(&self) -> String {
         self.name.clone()
+    }
+
+    fn version(&self) -> String {
+        self.version.to_string()
     }
 
     fn mount(&self) -> Vec<PathBuf> {
@@ -103,5 +101,17 @@ impl EvaluateeIF for Evaluatee {
             .collect();
         cmd.args(args);
         cmd
+    }
+
+    fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
+        if let Some(res) = self.exit_code.get(&code) {
+            EvaluationResult::Success(res.clone(), time)
+        } else {
+            if code == 0 {
+                EvaluationResult::Success("Success".to_string(), time)
+            } else {
+                EvaluationResult::Failed
+            }
+        }
     }
 }

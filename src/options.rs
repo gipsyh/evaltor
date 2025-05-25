@@ -80,12 +80,28 @@ impl Options {
             cmd: PathBuf,
             args: Vec<String>,
         }
-        let evaluatee_config: HashMap<String, TomlEvaluatee> =
+        #[derive(serde::Deserialize, Debug)]
+        struct TomlEvaluatees {
+            name: String,
+            exit_code: HashMap<String, String>,
+            #[serde(flatten)]
+            evaluatees: HashMap<String, TomlEvaluatee>,
+        }
+
+        let config: TomlEvaluatees =
             toml::de::from_str(&fs::read_to_string(&self.evaluatee_config).unwrap())?;
+        let exit_code: HashMap<i64, String> = config
+            .exit_code
+            .into_iter()
+            .map(|(k, v)| (k.parse::<i64>().unwrap(), v))
+            .collect();
         let mut evaluatees: Vec<Arc<dyn EvaluateeIF>> = Vec::new();
         for e in self.evaluatee.iter() {
-            let te = evaluatee_config.get(e).unwrap();
-            evaluatees.push(Arc::new(Evaluatee::new(e, &te.cmd, &te.args)));
+            let te = config.evaluatees.get(e).unwrap();
+            let mut evaluatee = Evaluatee::new(&config.name, &te.cmd, &te.args);
+            evaluatee.version = e.to_string();
+            evaluatee.exit_code = exit_code.clone();
+            evaluatees.push(Arc::new(evaluatee));
         }
         Ok(evaluatees)
     }

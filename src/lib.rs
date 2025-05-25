@@ -68,7 +68,8 @@ impl Evaltor {
     pub fn evaluate(self) {
         for evaluatee in self.evaluatees.iter() {
             let num_worker = self.num_worker / evaluatee.parallelism();
-            let file = if let Some(version) = evaluatee.version() {
+            let version = evaluatee.version();
+            let file = if !version.is_empty() {
                 format!(
                     "result/{}-{}-{}-{}",
                     evaluatee.name(),

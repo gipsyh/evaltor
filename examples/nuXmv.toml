@@ -1,3 +1,6 @@
+name = "nuXmv"
+exit_code = { 0 = "Safe", 1 = "Unsafe" }
+
 [cav23]
 cmd = "/root/i-Good_Lemmas_MC/nuXmv/nuXmv-ic3"
 args = [
