@@ -1,0 +1,6 @@
+name = "rIC3"
+exit_code = { 10 = "Unsafe", 20 = "Safe" }
+
+[default]
+cmd = "/root/rIC3/target/release/rIC3"
+args = ["-e", "ic3", "${case}"]

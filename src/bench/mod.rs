@@ -2,7 +2,7 @@ pub mod filter;
 pub mod fuzz;
 
 use filter::BenchFilter;
-use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
+use rand::{SeedableRng, rngs::StdRng, seq::SliceRandom};
 use std::{collections::HashSet, fs::read_dir, path::PathBuf};
 
 fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
@@ -28,7 +28,7 @@ fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
 }
 
 pub trait BenchIF {
-    fn name(&self) -> &str;
+    fn name(&self) -> String;
 
     fn cases(&self) -> Vec<PathBuf>;
 
@@ -53,8 +53,8 @@ impl Benchmark {
 }
 
 impl BenchIF for Benchmark {
-    fn name(&self) -> &str {
-        &self.name
+    fn name(&self) -> String {
+        self.name.clone()
     }
 
     fn cases(&self) -> Vec<PathBuf> {
@@ -95,11 +95,12 @@ impl MultiBenchmark {
 }
 
 impl BenchIF for MultiBenchmark {
-    fn name(&self) -> &str {
+    fn name(&self) -> String {
         if let Some(n) = &self.name {
-            n
+            n.clone()
         } else {
-            self.benchs[0].name()
+            let name: Vec<_> = self.benchs.iter().map(|b| b.name()).collect();
+            name.join("_")
         }
     }
 

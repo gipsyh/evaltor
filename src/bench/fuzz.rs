@@ -26,13 +26,15 @@ impl FuzzBench {
         for _ in 0..num {
             let fuzz =
                 tempfile::NamedTempFile::with_suffix_in(".aig", "/tmp/evaltor/fuzz").unwrap();
-            assert!(Command::new("aigfuzz")
-                .args(["-2", "-m", "-s", "-S", "-o"])
-                .arg(fuzz.path())
-                .output()
-                .unwrap()
-                .status
-                .success());
+            assert!(
+                Command::new("aigfuzz")
+                    .args(["-2", "-m", "-s", "-S", "-o"])
+                    .arg(fuzz.path())
+                    .output()
+                    .unwrap()
+                    .status
+                    .success()
+            );
             cases.push(fuzz);
         }
         Self { cases }
@@ -40,8 +42,8 @@ impl FuzzBench {
 }
 
 impl BenchIF for FuzzBench {
-    fn name(&self) -> &str {
-        "fuzz"
+    fn name(&self) -> String {
+        "fuzz".to_string()
     }
 
     fn cases(&self) -> Vec<PathBuf> {

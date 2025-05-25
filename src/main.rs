@@ -1,5 +1,5 @@
 use clap::Parser;
-use evaltor::{options::Options, Evaltor};
+use evaltor::{Evaltor, options::Options};
 use std::{fs, time::Duration};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

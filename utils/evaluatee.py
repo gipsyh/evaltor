@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Dict, Optional, Union
 
 
@@ -22,7 +23,10 @@ class Evaluatee:
                 elif time == "Failed":
                     self.memout.add(case)
                 else:
-                    time = float(time)
+                    match = re.match(r'([a-zA-Z]+)\(([-+]?\d*\.\d+|\d+)\)', time)
+                    assert match
+                    tag = match.group(1)
+                    time = float(match.group(2))
                     if time > self.TIMEOUT:
                         self.timeout.add(case)
                     else:

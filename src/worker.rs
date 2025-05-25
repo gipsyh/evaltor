@@ -1,5 +1,5 @@
-use crate::{bench::BenchIF, evaluatees::EvaluationResult, EvaluateeIF};
-use bollard::{container, secret::HostConfig, Docker};
+use crate::{EvaluateeIF, bench::BenchIF, evaluatees::EvaluationResult};
+use bollard::{Docker, container, secret::HostConfig};
 use bytes::Bytes;
 use crossbeam::queue::SegQueue;
 use futures::{StreamExt, TryStreamExt};
