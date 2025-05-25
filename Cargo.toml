@@ -2,6 +2,8 @@
 name = "evaltor"
 version = "0.1.0"
 edition = "2024"
+repository = "https://github.com/gipsyh/evaltor"
+description = "A tool for evaluating the evaluatees on benchmarks"
 authors = ["Yuheng Su <gipsyh.icu@gmail.com>"]
 license = "MIT"
 
