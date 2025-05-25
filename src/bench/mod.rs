@@ -122,12 +122,7 @@ impl BenchIF for MultiBenchmark {
     }
 
     fn mount(&self) -> Vec<PathBuf> {
-        let benchs: HashSet<PathBuf> = self
-            .benchs
-            .iter()
-            .flat_map(|b| b.mount())
-            .map(|b| b.canonicalize().unwrap())
-            .collect();
+        let benchs: HashSet<PathBuf> = self.benchs.iter().flat_map(|b| b.mount()).collect();
         benchs.into_iter().collect()
     }
 }

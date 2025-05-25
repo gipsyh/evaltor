@@ -1,4 +1,4 @@
-use crate::Evaluatee;
+use crate::EvaluateeIF;
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -6,7 +6,7 @@ use std::{
 
 pub struct IC3;
 
-impl Evaluatee for IC3 {
+impl EvaluateeIF for IC3 {
     fn name(&self) -> String {
         "avr".to_string()
     }
@@ -39,7 +39,7 @@ impl Evaluatee for IC3 {
 
 pub struct Portfolio;
 
-impl Evaluatee for Portfolio {
+impl EvaluateeIF for Portfolio {
     fn name(&self) -> String {
         "avr".to_string()
     }

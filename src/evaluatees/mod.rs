@@ -8,7 +8,6 @@ pub mod abc;
 pub mod avr;
 pub mod avy;
 pub mod ic3ref;
-pub mod nuxmv;
 pub mod pono;
 pub mod ric3;
 
@@ -20,7 +19,7 @@ pub enum EvaluationResult {
     CertifyFailed,
 }
 
-pub trait Evaluatee: Send + Sync {
+pub trait EvaluateeIF: Send + Sync {
     fn name(&self) -> String;
 
     fn version(&self) -> Option<String> {
@@ -61,5 +60,48 @@ where
         EvaluationResult::Success(time)
     } else {
         EvaluationResult::Failed
+    }
+}
+
+pub struct Evaluatee {
+    pub name: String,
+    pub cmd: PathBuf,
+    pub args: Vec<String>,
+}
+
+impl Evaluatee {
+    pub fn new(name: &str, cmd: &PathBuf, args: &[String]) -> Self {
+        Self {
+            name: name.to_string(),
+            cmd: cmd.clone(),
+            args: args.to_vec(),
+        }
+    }
+}
+
+impl EvaluateeIF for Evaluatee {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn mount(&self) -> Vec<PathBuf> {
+        vec![self.cmd.clone()]
+    }
+
+    fn evaluate(&self, model: &Path) -> Command {
+        let mut cmd = Command::new(&self.cmd);
+        let args: Vec<String> = self
+            .args
+            .iter()
+            .map(|arg| {
+                if arg == "${case}" {
+                    model.to_str().unwrap().to_string()
+                } else {
+                    arg.clone()
+                }
+            })
+            .collect();
+        cmd.args(args);
+        cmd
     }
 }

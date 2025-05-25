@@ -1,11 +1,11 @@
-use crate::{bench::BenchIF, evaluatees::EvaluationResult, Evaluatee};
+use crate::{bench::BenchIF, evaluatees::EvaluationResult, EvaluateeIF};
 use bollard::{container, secret::HostConfig, Docker};
 use bytes::Bytes;
 use crossbeam::queue::SegQueue;
 use futures::{StreamExt, TryStreamExt};
 use indicatif::ProgressBar;
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{BufWriter, Write},
     path::{Path, PathBuf},
     process::Command,
@@ -50,7 +50,11 @@ impl Share {
         }
         let result_file = format!("{}.txt", file);
         let log_file = format!("{}.log", file);
-        let res_file = File::create(Path::new(&result_file)).unwrap();
+        let result_file = Path::new(&result_file);
+        if let Some(parent) = Path::new(result_file).parent() {
+            fs::create_dir_all(parent).unwrap();
+        }
+        let res_file = File::create(result_file).unwrap();
         let log_file = BufWriter::new(File::create(Path::new(&log_file)).unwrap());
         let pb = indicatif::ProgressBar::new(cases.len() as _);
         pb.set_style(
@@ -100,13 +104,13 @@ impl Share {
 }
 
 pub struct Worker {
-    evaluatee: Arc<dyn Evaluatee>,
+    evaluatee: Arc<dyn EvaluateeIF>,
     share: Share,
     docker: Docker,
 }
 
 impl Worker {
-    pub fn new(evaluatee: Arc<dyn Evaluatee>, share: Share) -> Self {
+    pub fn new(evaluatee: Arc<dyn EvaluateeIF>, share: Share) -> Self {
         let docker = Docker::connect_with_local_defaults().unwrap();
         Self {
             evaluatee,

@@ -1,4 +1,4 @@
-use crate::Evaluatee;
+use crate::EvaluateeIF;
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -6,7 +6,7 @@ use std::{
 
 pub struct Pdr;
 
-impl Evaluatee for Pdr {
+impl EvaluateeIF for Pdr {
     fn name(&self) -> String {
         "abcpdr".to_string()
     }
@@ -30,7 +30,7 @@ impl Evaluatee for Pdr {
 
 pub struct SuperProve;
 
-impl Evaluatee for SuperProve {
+impl EvaluateeIF for SuperProve {
     fn name(&self) -> String {
         "abc".to_string()
     }

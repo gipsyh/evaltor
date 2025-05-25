@@ -7,14 +7,14 @@ mod worker;
 
 use bench::BenchIF;
 use chrono::Local;
-use evaluatees::Evaluatee;
+use evaluatees::EvaluateeIF;
 use regex::Regex;
 use std::{sync::Arc, thread::spawn, time::Duration};
 use worker::{Share, Worker};
 
 pub struct Evaltor {
     benchmark: Box<dyn BenchIF>,
-    evaluatees: Vec<Arc<dyn Evaluatee>>,
+    evaluatees: Vec<Arc<dyn EvaluateeIF>>,
     timeout: Duration,
     memory_limit: usize,
     num_worker: usize,
@@ -40,28 +40,28 @@ impl Evaltor {
         self
     }
 
-    pub fn set_timeout(mut self, timeout: Duration) -> Self {
+    pub fn set_timeout(&mut self, timeout: Duration) -> &mut Self {
         self.timeout = timeout;
         self
     }
 
-    pub fn set_memory_limit(mut self, memory_limit: usize) -> Self {
+    pub fn set_memory_limit(&mut self, memory_limit: usize) -> &mut Self {
         self.memory_limit = memory_limit;
         self
     }
 
-    pub fn set_num_worker(mut self, num_worker: usize) -> Self {
+    pub fn set_num_worker(&mut self, num_worker: usize) -> &mut Self {
         self.num_worker = num_worker;
         self
     }
 
-    pub fn set_certify(mut self, certify: bool) -> Self {
+    pub fn set_certify(&mut self, certify: bool) -> &mut Self {
         self.certify = certify;
         self
     }
 
-    pub fn add_evaluatee(mut self, evaluatee: impl Evaluatee + 'static) -> Self {
-        self.evaluatees.push(Arc::new(evaluatee));
+    pub fn add_evaluatee(&mut self, evaluatee: Arc<dyn EvaluateeIF>) -> &mut Self {
+        self.evaluatees.push(evaluatee);
         self
     }
 

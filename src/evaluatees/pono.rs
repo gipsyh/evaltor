@@ -1,5 +1,5 @@
 use super::{result_analyse, EvaluationResult};
-use crate::Evaluatee;
+use crate::EvaluateeIF;
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -8,7 +8,7 @@ use std::{
 
 pub struct IC3sa;
 
-impl Evaluatee for IC3sa {
+impl EvaluateeIF for IC3sa {
     fn name(&self) -> String {
         "pono".to_string()
     }
@@ -35,7 +35,7 @@ impl Evaluatee for IC3sa {
 
 pub struct IC3ia;
 
-impl Evaluatee for IC3ia {
+impl EvaluateeIF for IC3ia {
     fn name(&self) -> String {
         "pono".to_string()
     }
@@ -62,7 +62,7 @@ impl Evaluatee for IC3ia {
 
 pub struct Portfolio;
 
-impl Evaluatee for Portfolio {
+impl EvaluateeIF for Portfolio {
     fn name(&self) -> String {
         "pono".to_string()
     }

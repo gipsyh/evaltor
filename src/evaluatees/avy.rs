@@ -1,5 +1,5 @@
 use super::{result_analyse, EvaluationResult};
-use crate::Evaluatee;
+use crate::EvaluateeIF;
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -7,7 +7,7 @@ use std::{
 
 pub struct Kavy;
 
-impl Evaluatee for Kavy {
+impl EvaluateeIF for Kavy {
     fn name(&self) -> String {
         "Avy".to_string()
     }
@@ -31,7 +31,7 @@ impl Evaluatee for Kavy {
 
 pub struct Pavy;
 
-impl Evaluatee for Pavy {
+impl EvaluateeIF for Pavy {
     fn name(&self) -> String {
         "Pavy".to_string()
     }
