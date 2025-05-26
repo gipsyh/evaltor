@@ -67,7 +67,7 @@ impl Options {
         } else {
             let mut bench = MultiBenchmark::new();
             for b in benchs {
-                bench = bench.add(b);
+                bench = bench.add_bench(b);
             }
             Box::new(bench)
         };

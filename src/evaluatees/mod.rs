@@ -62,11 +62,11 @@ pub struct Evaluatee {
 }
 
 impl Evaluatee {
-    pub fn new(name: &str, cmd: &PathBuf, args: &[String]) -> Self {
+    pub fn new(name: &str, cmd: &Path, args: &[String]) -> Self {
         Self {
             name: name.to_string(),
             version: "".to_string(),
-            cmd: cmd.clone(),
+            cmd: cmd.to_path_buf(),
             args: args.to_vec(),
             exit_code: Default::default(),
         }
@@ -106,12 +106,10 @@ impl EvaluateeIF for Evaluatee {
     fn result_analyse(&self, code: i64, time: Duration) -> EvaluationResult {
         if let Some(res) = self.exit_code.get(&code) {
             EvaluationResult::Success(res.clone(), time)
+        } else if code == 0 {
+            EvaluationResult::Success("Success".to_string(), time)
         } else {
-            if code == 0 {
-                EvaluationResult::Success("Success".to_string(), time)
-            } else {
-                EvaluationResult::Failed
-            }
+            EvaluationResult::Failed
         }
     }
 }

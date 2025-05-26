@@ -4,3 +4,7 @@ exit_code = { 10 = "Unsafe", 20 = "Safe" }
 [default]
 cmd = "/root/rIC3/target/release/rIC3"
 args = ["-e", "ic3", "${case}"]
+
+[live_l2s]
+cmd = "/root/rIC3/target/release/rIC3"
+args = ["-e", "ic3", "--l2s", "--ic3-ctg", "${case}"]

@@ -3,17 +3,21 @@ pub mod fuzz;
 
 use filter::BenchFilter;
 use rand::{SeedableRng, rngs::StdRng, seq::SliceRandom};
-use std::{collections::HashSet, fs::read_dir, path::PathBuf};
+use std::{
+    collections::HashSet,
+    fs::read_dir,
+    path::{Path, PathBuf},
+};
 
 fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
     let mut cases = Vec::new();
     for entry in read_dir(path).unwrap() {
         let path = entry.unwrap().path();
         if path.is_file() {
-            if let Some(extension) = path.extension() {
-                if extension.eq_ignore_ascii_case(format) {
-                    cases.push(path);
-                }
+            if let Some(extension) = path.extension()
+                && extension.eq_ignore_ascii_case(format)
+            {
+                cases.push(path);
             }
         } else if path.is_dir() {
             let sub_cases = search_cases(&path, format);
@@ -21,6 +25,8 @@ fn search_cases(path: &PathBuf, format: &str) -> Vec<PathBuf> {
         }
     }
     cases.sort();
+    let mut rng = StdRng::seed_from_u64(0);
+    cases.shuffle(&mut rng);
     cases
         .into_iter()
         .map(|c| c.canonicalize().unwrap())
@@ -43,10 +49,10 @@ pub struct Benchmark {
 }
 
 impl Benchmark {
-    pub fn new(name: &str, path: &PathBuf, format: &str) -> Self {
+    pub fn new(name: &str, path: &Path, format: &str) -> Self {
         Self {
             name: name.to_string(),
-            path: path.clone(),
+            path: path.to_path_buf(),
             format: format.to_string(),
         }
     }
@@ -88,7 +94,7 @@ impl MultiBenchmark {
         self
     }
 
-    pub fn add(mut self, b: Box<dyn BenchIF>) -> Self {
+    pub fn add_bench(mut self, b: Box<dyn BenchIF>) -> Self {
         self.benchs.push(b);
         self
     }

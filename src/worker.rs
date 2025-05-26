@@ -48,8 +48,8 @@ impl Share {
         for b in bench.cases() {
             cases.push(b);
         }
-        let result_file = format!("{}.txt", file);
-        let log_file = format!("{}.log", file);
+        let result_file = format!("{file}.txt");
+        let log_file = format!("{file}.log");
         let result_file = Path::new(&result_file);
         if let Some(parent) = Path::new(result_file).parent() {
             fs::create_dir_all(parent).unwrap();
@@ -224,11 +224,11 @@ impl Worker {
                     .evaluate_with_certify(&case, certificate_path);
                 let (mut res, log) =
                     rt.block_on(self.evaluate(command, vec![PathBuf::from(certificate_path)]));
-                if let EvaluationResult::Success(..) = res {
-                    if !self.evaluatee.certify(case.as_path(), certificate_path) {
-                        println!("certify {} failed", case.display());
-                        res = EvaluationResult::CertifyFailed;
-                    }
+                if let EvaluationResult::Success(..) = res
+                    && !self.evaluatee.certify(case.as_path(), certificate_path)
+                {
+                    println!("certify {} failed", case.display());
+                    res = EvaluationResult::CertifyFailed;
                 }
                 self.share.submit_result(&case, res, log);
             } else {
