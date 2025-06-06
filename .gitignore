@@ -2,6 +2,7 @@
 /Cargo.lock
 /result*
 merge-result
+*.csv
 plot.png
 scatter.png
 best-result

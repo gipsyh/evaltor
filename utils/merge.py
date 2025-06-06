@@ -1,5 +1,6 @@
 import sys
 from evaluatee import Evaluatee
+import pandas as pd
 
 
 def merge(evaluatee: list[Evaluatee]):
@@ -12,14 +13,17 @@ def merge(evaluatee: list[Evaluatee]):
 if __name__ == "__main__":
     evaluatee = []
     for file in sys.argv[1:]:
-        evaluatee.append(Evaluatee(file))
+        evaluatee.append(Evaluatee(file))  # 假设 Evaluatee(file).name 可获取文件名
+
     merged = merge(evaluatee)
-    with open("merge-result", "w") as result:
-        keys = sorted(merged.keys())
-        for case in merged:
-            output = f"{case} "
-            output += " ".join(
-                str(time) if time != "None(None)" else "Timeout"
-                for time in merged[case]
-            )
-            result.write(output + "\n")
+
+    rows = {}
+    for case, times in merged.items():
+        processed = [time if time != "None(None)" else "Timeout" for time in times]
+        rows[case] = processed
+
+    df = pd.DataFrame.from_dict(rows, orient="index")
+
+    df.columns = [e.name for e in evaluatee]
+
+    df.to_csv("merge-result.csv", index_label="Case")
