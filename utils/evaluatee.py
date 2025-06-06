@@ -11,19 +11,24 @@ class Evaluatee:
             name if name is not None else os.path.splitext(os.path.basename(file))[0]
         )
         self.data: Dict[str, float] = {}
+        self._tag: Dict[str, str] = {}
         self.timeout = set()
         self.memout = set()
         with open(file, "r") as file:
             for line in file:
                 case, time = line.strip().split()
                 case = case.rsplit("/", 1)[-1]
-                case = case.rsplit(".", 1)[0] if case.endswith((".aig", ".btor", ".btor2")) else case
+                case = (
+                    case.rsplit(".", 1)[0]
+                    if case.endswith((".aig", ".btor", ".btor2"))
+                    else case
+                )
                 if time == "Timeout":
                     self.timeout.add(case)
                 elif time == "Failed":
                     self.memout.add(case)
                 else:
-                    match = re.match(r'([a-zA-Z]+)\(([-+]?\d*\.\d+|\d+)\)', time)
+                    match = re.match(r"([a-zA-Z]+)\(([-+]?\d*\.\d+|\d+)\)", time)
                     assert match
                     tag = match.group(1)
                     time = float(match.group(2))
@@ -31,9 +36,13 @@ class Evaluatee:
                         self.timeout.add(case)
                     else:
                         self.data[case] = time
+                        self._tag[case] = tag
 
     def __getitem__(self, key):
         return self.data.get(key)
+
+    def tag(self, key):
+        return self._tag.get(key)
 
     def cases(self) -> list[str]:
         return list(self.data.keys() | self.timeout | self.memout)

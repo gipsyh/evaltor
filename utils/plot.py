@@ -40,6 +40,7 @@ def plot(evaluatee: list[Evaluatee]):
     plt.show()
     plt.savefig("plot.png", dpi=1000)
 
+
 if __name__ == "__main__":
     evaluatee = []
     for file in sys.argv[1:]:
