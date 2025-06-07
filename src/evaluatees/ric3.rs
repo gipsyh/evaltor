@@ -1,4 +1,4 @@
-use super::{result_analyse, EvaluationResult};
+use super::EvaluationResult;
 use crate::EvaluateeIF;
 use std::{
     path::{Path, PathBuf},
@@ -12,8 +12,8 @@ impl EvaluateeIF for IC3 {
         "rIC3".to_string()
     }
 
-    fn version(&self) -> Option<String> {
-        Some("dynamic".to_string())
+    fn version(&self) -> String {
+        "rlive".to_string()
     }
 
     fn mount(&self) -> Vec<PathBuf> {
@@ -23,16 +23,7 @@ impl EvaluateeIF for IC3 {
     fn evaluate(&self, model: &Path) -> Command {
         let mut command = Command::new("/root/rIC3/target/release/rIC3");
         command.arg("-e");
-        command.arg("ic3");
-        command.arg("--ic3-ctg");
-        command.arg("--ic3-dynamic");
-        command.arg("-v0");
-        // command.arg("--ic3-inn");
-        // command.arg("--ic3-no-dynamic");
-        // command.arg("--ic3-ctg-limit");
-        // command.arg("5");
-        // command.arg("--certify");
-        // command.arg("--ic3-inn");
+        command.arg("rlive");
         command.arg(model);
         command
     }
@@ -64,12 +55,16 @@ impl EvaluateeIF for IC3 {
             false
         } else {
             panic!(
-                    "certifaiger maybe not avaliable, please build docker image from https://github.com/Froleyks/certifaiger"
-                );
+                "certifaiger maybe not avaliable, please build docker image from https://github.com/Froleyks/certifaiger"
+            );
         }
     }
 
     fn result_analyse(&self, code: i64, time: std::time::Duration) -> EvaluationResult {
-        result_analyse(code, time, |c| matches!(c, 10 | 20))
+        match code {
+            10 => EvaluationResult::Success("Unsafe".to_string(), time),
+            20 => EvaluationResult::Success("Safe".to_string(), time),
+            _ => EvaluationResult::Failed,
+        }
     }
 }

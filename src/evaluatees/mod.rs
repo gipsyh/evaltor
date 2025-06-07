@@ -8,8 +8,6 @@ use std::{
 // pub mod abc;
 // pub mod avr;
 // pub mod avy;
-// pub mod ic3ref;
-// pub mod pono;
 // pub mod ric3;
 
 #[derive(Debug, Clone)]
