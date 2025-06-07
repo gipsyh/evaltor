@@ -15,6 +15,11 @@ class Evaluatee:
         self.timeout = set()
         self.memout = set()
         with open(file, "r") as file:
+            first_line = file.readline().strip()
+            if first_line.startswith("# TimeLimit"):
+                self.TIMEOUT = float(first_line.split()[2])
+            else:
+                self.TIMEOUT = 3600
             for line in file:
                 case, time = line.strip().split()
                 case = case.rsplit("/", 1)[-1]

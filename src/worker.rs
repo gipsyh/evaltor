@@ -54,7 +54,8 @@ impl Share {
         if let Some(parent) = Path::new(result_file).parent() {
             fs::create_dir_all(parent).unwrap();
         }
-        let res_file = File::create(result_file).unwrap();
+        let mut res_file = File::create(result_file).unwrap();
+        writeln!(res_file, "# TimeLimit {}", timeout.as_secs()).unwrap();
         let log_file = BufWriter::new(File::create(Path::new(&log_file)).unwrap());
         let pb = indicatif::ProgressBar::new(cases.len() as _);
         pb.set_style(
