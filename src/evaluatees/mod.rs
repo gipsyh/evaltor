@@ -56,6 +56,7 @@ pub struct Evaluatee {
     pub version: String,
     pub cmd: PathBuf,
     pub args: Vec<String>,
+    pub parallelism: usize,
     pub exit_code: HashMap<i64, String>,
 }
 
@@ -67,6 +68,7 @@ impl Evaluatee {
             cmd: cmd.to_path_buf(),
             args: args.to_vec(),
             exit_code: Default::default(),
+            parallelism: 1,
         }
     }
 }
@@ -109,5 +111,9 @@ impl EvaluateeIF for Evaluatee {
         } else {
             EvaluationResult::Failed
         }
+    }
+
+    fn parallelism(&self) -> usize {
+        self.parallelism
     }
 }

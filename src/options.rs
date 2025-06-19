@@ -79,6 +79,7 @@ impl Options {
         struct TomlEvaluatee {
             cmd: PathBuf,
             args: Vec<String>,
+            parallelism: Option<usize>,
         }
         #[derive(serde::Deserialize, Debug)]
         struct TomlEvaluatees {
@@ -99,6 +100,9 @@ impl Options {
         for e in self.evaluatee.iter() {
             let te = config.evaluatees.get(e).unwrap();
             let mut evaluatee = Evaluatee::new(&config.name, &te.cmd, &te.args);
+            if let Some(parallelism) = te.parallelism {
+                evaluatee.parallelism = parallelism;
+            }
             evaluatee.version = e.to_string();
             evaluatee.exit_code = exit_code.clone();
             evaluatees.push(Arc::new(evaluatee));

@@ -1,10 +1,23 @@
 name = "rIC3"
 exit_code = { 10 = "Unsafe", 20 = "Safe" }
 
-[default]
+[ic3_default]
 cmd = "/root/rIC3/target/release/rIC3"
 args = ["-e", "ic3", "${case}"]
 
-[live_l2s]
+[ic3_inf]
 cmd = "/root/rIC3/target/release/rIC3"
-args = ["-e", "ic3", "--l2s", "--ic3-ctg", "${case}"]
+args = ["-e", "ic3", "${case}"]
+
+[ic3_l2s]
+cmd = "/root/rIC3/target/release/rIC3"
+args = ["-e", "ic3", "${case}"]
+
+[rlive]
+cmd = "/root/rIC3/target/release/rIC3"
+args = ["-e", "rlive", "${case}", "--certify"]
+
+[portfolio]
+cmd = "/root/rIC3/target/release/rIC3"
+args = ["-e", "portfolio", "${case}"]
+parallelism = 16

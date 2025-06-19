@@ -17,7 +17,7 @@ class Evaluatee:
         with open(file, "r") as file:
             first_line = file.readline().strip()
             if first_line.startswith("# TimeLimit"):
-                self.TIMEOUT = float(first_line.split()[2])
+                self.TIMEOUT = int(first_line.split()[2])
             else:
                 self.TIMEOUT = 3600
             for line in file:
